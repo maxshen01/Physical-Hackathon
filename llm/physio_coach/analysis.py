@@ -1,12 +1,16 @@
 """OpenAI selection from server-approved measurement-backed cues."""
 
 import json
+import logging
 
 from openai import APITimeoutError, OpenAI, OpenAIError
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .models import FeedbackRequest
 from .rules import Candidate
+
+
+logger = logging.getLogger("uvicorn.error")
 
 
 class AnalysisError(Exception):
@@ -54,8 +58,18 @@ def choose_cues(
     except APITimeoutError as exc:
         raise AnalysisError("The analysis timed out. Please try again.") from exc
     except OpenAIError as exc:
+        logger.warning(
+            "OpenAI cue selection failed: error_type=%s request_id=%s",
+            type(exc).__name__, getattr(exc, "request_id", None),
+        )
         raise AnalysisError("The analysis service is unavailable") from exc
 
+    logger.info(
+        "OpenAI cue selection response: response_id=%s status=%s incomplete_reason=%s output_text=%r",
+        getattr(response, "id", None), response.status,
+        getattr(getattr(response, "incomplete_details", None), "reason", None),
+        response.output_text,
+    )
     if any(getattr(part, "type", None) == "refusal"
            for item in getattr(response, "output", [])
            for part in getattr(item, "content", [])):
@@ -69,4 +83,5 @@ def choose_cues(
     approved = {item.id for item in candidates}
     if len(selection.cue_ids) != len(set(selection.cue_ids)) or any(item not in approved for item in selection.cue_ids):
         raise AnalysisError("The analysis selected an unsupported cue")
+    logger.info("OpenAI cue selection accepted: cue_ids=%s", selection.cue_ids)
     return selection.cue_ids

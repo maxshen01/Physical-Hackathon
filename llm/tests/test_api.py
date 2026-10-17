@@ -58,14 +58,16 @@ def test_missing_peak_skips_model(monkeypatch):
     assert response.json()["feedback"]["status"] == "unable_to_assess"
 
 
-def test_in_range_uses_no_model(monkeypatch):
+def test_in_range_uses_no_model(monkeypatch, caplog):
     configure(monkeypatch)
     monkeypatch.setattr(main, "choose_cues", lambda *_args: (_ for _ in ()).throw(AssertionError("No model call")))
     monkeypatch.setattr(main, "synthesize_speech", lambda *_args: b"audio")
-    response = client.post("/api/feedback", json=payload(peak={"knee_left_deg": 90}))
+    with caplog.at_level("INFO", logger="uvicorn.error"):
+        response = client.post("/api/feedback", json=payload(peak={"knee_left_deg": 90}))
     assert response.status_code == 200
     assert response.json()["feedback"]["status"] == "assessable"
     assert response.json()["feedback"]["cues"] == []
+    assert "No eligible correction cues" in caplog.text
 
 
 def test_invalid_request_is_rejected(monkeypatch):

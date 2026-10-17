@@ -138,3 +138,7 @@ A single capture is never labelled a movement peak. It cannot trigger squat/push
 For the simplest setup, use the combined `demo:app` server described in the root README. Both `/capture/image` and `/api/feedback` share the same HTTPS origin; a separate hosted service is optional. Voice feedback plays automatically in the app and can be replayed or stopped. Audio errors preserve the validated transcript. Local image and audio history is not stored.
 
 The LLM client bounds its request to 45 seconds without automatic retries; ElevenLabs has a 45-second HTTP timeout. Refusals, incomplete output, unsupported cue IDs, malformed JSON and timeouts return explicit analysis errors; unvalidated model text is never sent to speech. Requests use the [Responses API structured output format](https://developers.openai.com/api/docs/guides/structured-outputs).
+
+## Logging
+
+At the default Uvicorn `info` log level, the server logs when the rules find no eligible cue. When OpenAI is called, it logs the response ID, status, incomplete reason, returned `output_text`, and validated cue IDs. Provider request failures log the error type and request ID. These logs do not include API keys or the measurement request, but model output is logged, so restrict access to server logs.
