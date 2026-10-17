@@ -14,6 +14,8 @@ struct PlacementEngineTests {
         }
         let squat = PlacementEngine.recommend(exercise: .squat, subjectHeightCM: 170, headingDegrees: 0, setupMarker: .bottom)!
         precondition(squat.marker == .right && squat.cameraHeightCM == 85)
+        let facesLeft = PlacementEngine.recommend(exercise: .squat, subjectHeightCM: 170, headingDegrees: 270, setupMarker: .bottom)!
+        precondition(facesLeft.marker == .bottom && facesLeft.cameraHeightCM == 85)
         let left = PlacementEngine.recommend(exercise: .pushup, subjectHeightCM: 180, headingDegrees: 0, setupMarker: .left)!
         precondition(left.marker == .left && left.cameraHeightCM == 45)
         let facesDown = PlacementEngine.recommend(exercise: .squat, subjectHeightCM: 170, headingDegrees: 180, setupMarker: .left)!

@@ -8,6 +8,7 @@ struct ContentView: View {
     @State private var exercise: PlacementExercise = .squat
     @State private var heightText = "170"
     @State private var setupMarker: FloorMarker = .bottom
+    @State private var facingOverride: FloorMarker?
     @Environment(\.scenePhase) private var scenePhase
 
     private var heightCM: Double { Double(heightText) ?? 0 }
@@ -60,6 +61,12 @@ struct ContentView: View {
                             Text("\(mark.number) · \(mark.title)").tag(mark)
                         }
                     }
+                    Picker("Subject faces (if estimate is wrong)", selection: $facingOverride) {
+                        Text("Automatic").tag(nil as FloorMarker?)
+                        ForEach(FloorMarker.allCases) { mark in
+                            Text("\(mark.number) · \(mark.title)").tag(Optional(mark))
+                        }
+                    }
                 }
                 .padding(14)
                 .background(panel, in: RoundedRectangle(cornerRadius: 16))
@@ -67,6 +74,13 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     if let result = camera.recommendation {
                         Text(result.summary).font(.title2.bold())
+                        if let facingOverride {
+                            Text("Corrected facing: mark \(facingOverride.number) · \(facingOverride.title)")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        } else {
+                            Text("Estimated facing: mark \(Int((result.subjectHeadingDegrees / 45).rounded()) % 8 + 1) · \(Int(result.subjectHeadingDegrees.rounded()))°")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
                         Text("Place the phone at mark \(result.marker.number). Set the camera lens \(result.cameraHeightCM) cm above the floor.")
                         Text("Approx. camera angle: \(result.approximateCameraAngleDegrees)° clockwise from the subject’s facing direction")
                             .font(.subheadline)
@@ -87,14 +101,14 @@ struct ContentView: View {
                 HStack(spacing: 10) {
                     Button(camera.running ? "Stop" : "Start setup camera") {
                         if camera.running { camera.stop() }
-                        else { camera.start(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker) }
+                        else { camera.start(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(signal)
                     .frame(maxWidth: .infinity)
                     if camera.running {
                         Button(camera.locked ? "Scan again" : "Lock placement") {
-                            if camera.locked { camera.scanAgain() }
+                            if camera.locked { camera.scanAgain(); facingOverride = nil }
                             else { camera.lockPlacement() }
                         }
                         .buttonStyle(.bordered)
@@ -116,9 +130,10 @@ struct ContentView: View {
         }
         .background(Color(red: 0.07, green: 0.08, blue: 0.10))
         .preferredColorScheme(.dark)
-        .onChange(of: exercise) { _, value in camera.update(exercise: value, heightCM: heightCM, setupMarker: setupMarker) }
-        .onChange(of: heightText) { _, _ in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker) }
-        .onChange(of: setupMarker) { _, value in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: value) }
+        .onChange(of: exercise) { _, value in camera.update(exercise: value, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
+        .onChange(of: heightText) { _, _ in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
+        .onChange(of: setupMarker) { _, value in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: value, facingOverride: facingOverride) }
+        .onChange(of: facingOverride) { _, value in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: value) }
         .onChange(of: scenePhase) { _, phase in if phase != .active { camera.stop() } }
         .sheet(isPresented: Binding(
             get: { camera.capturedPhoto != nil },

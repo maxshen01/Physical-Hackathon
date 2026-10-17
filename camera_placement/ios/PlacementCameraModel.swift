@@ -24,10 +24,11 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
     private var exercise: PlacementExercise = .squat
     private var heightCM: Double = 170
     private var setupMarker: FloorMarker = .bottom
+    private var facingOverride: FloorMarker?
     private var headings = HeadingWindow()
     private var currentRecommendation: PlacementRecommendation?
 
-    func start(exercise: PlacementExercise, heightCM: Double, setupMarker: FloorMarker) {
+    func start(exercise: PlacementExercise, heightCM: Double, setupMarker: FloorMarker, facingOverride: FloorMarker?) {
         guard (80...250).contains(heightCM) else {
             message = "Enter a subject height between 80 and 250 cm."
             return
@@ -47,6 +48,7 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
                     self.exercise = exercise
                     self.heightCM = heightCM
                     self.setupMarker = setupMarker
+                    self.facingOverride = facingOverride
                     self.headings.reset()
                     self.currentRecommendation = nil
                     self.isLocked = false
@@ -63,6 +65,7 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
                         self.capturedPhoto = nil
                         self.message = "Hold the phone upright at marker \(setupMarker.number), aimed at one fully visible person."
                     }
+                    self.recommendFromOverride()
                 } catch {
                     self.active = false
                     self.wantsStart = false
@@ -72,11 +75,12 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
         }
     }
 
-    func update(exercise: PlacementExercise, heightCM: Double, setupMarker: FloorMarker) {
+    func update(exercise: PlacementExercise, heightCM: Double, setupMarker: FloorMarker, facingOverride: FloorMarker?) {
         queue.async {
             self.exercise = exercise
             self.heightCM = heightCM
             self.setupMarker = setupMarker
+            self.facingOverride = facingOverride
             self.headings.reset()
             self.currentRecommendation = nil
             self.isLocked = false
@@ -90,13 +94,14 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
                     ? "Hold the phone upright at marker \(setupMarker.number), aimed at one fully visible person."
                     : "Enter a subject height between 80 and 250 cm."
             }
+            self.recommendFromOverride()
         }
     }
 
     func lockPlacement() {
         queue.async {
             guard self.active, self.currentRecommendation != nil,
-                  Date().timeIntervalSince(self.lastGoodPose) < 2 else { return }
+                  (self.facingOverride != nil || Date().timeIntervalSince(self.lastGoodPose) < 2) else { return }
             self.isLocked = true
             self.publish {
                 self.locked = true
@@ -109,6 +114,7 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
         queue.async {
             guard self.active else { return }
             self.isLocked = false
+            self.facingOverride = nil
             self.currentRecommendation = nil
             self.headings.reset()
             self.lastGoodPose = .distantPast
@@ -188,6 +194,7 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let now = Date()
         guard active, !isLocked, (80...250).contains(heightCM),
+              facingOverride == nil,
               now.timeIntervalSince(lastPoseFrame) >= 0.45,
               let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         lastPoseFrame = now
@@ -240,5 +247,18 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
 
     private func publish(_ action: @escaping @Sendable () -> Void) {
         DispatchQueue.main.async(execute: action)
+    }
+
+    private func recommendFromOverride() {
+        guard active, let facingOverride,
+              let result = PlacementEngine.recommend(
+                exercise: exercise, subjectHeightCM: heightCM,
+                headingDegrees: facingOverride.angleDegrees, setupMarker: setupMarker
+              ) else { return }
+        currentRecommendation = result
+        publish {
+            self.recommendation = result
+            self.message = "Using corrected facing direction. Lock placement before moving the phone."
+        }
     }
 }

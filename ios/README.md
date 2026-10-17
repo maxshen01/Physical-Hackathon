@@ -7,7 +7,10 @@ height, select the physical setup mark, and start the rear camera. A stable
 direction estimate highlights one of eight floor marks, gives a lens height,
 and estimates the camera's angle clockwise from the subject's facing direction.
 Lock the recommendation before moving the phone, then take a photo. The photo
-is previewed in memory and is not saved by the app.
+is previewed in memory and is not saved by the app. The recommendation shows
+its inferred facing direction. If it is wrong, select the actual direction in
+**Subject faces (if estimate is wrong)**, or select **Automatic** to resume
+live detection.
 
 All live pose inference uses Apple Vision on the iPhone. The iOS target has no
 HTTP client, server address, provider key, model download, or local network

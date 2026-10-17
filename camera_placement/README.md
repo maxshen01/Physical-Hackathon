@@ -28,6 +28,11 @@ recommendation appears, then tap **Lock placement** before moving it. Put the
 phone at the highlighted mark, set its **lens** to the shown height above the
 floor, and tap **Take photo**. The app stores no photo history.
 
+The recommendation shows the direction inferred from the setup image. If that
+direction is wrong, choose the correct floor mark in **Subject faces (if
+estimate is wrong)**. The recommendation is recalculated on the phone using
+the same fixed preset. Select **Automatic** to try live detection again.
+
 ## Fixed presets
 
 | Exercise | Desired view | Lens height above floor |
