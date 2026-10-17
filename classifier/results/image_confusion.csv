@@ -1,0 +1,5 @@
+expected,lateral_raise,pushup,squat,unknown
+lateral_raise,17,0,0,3
+pushup,0,20,0,0
+squat,0,0,19,1
+unknown,0,0,0,40

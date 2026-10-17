@@ -1,0 +1,307 @@
+{
+  "clips" : [
+    {
+      "correctDisplay" : 10,
+      "correctRaw" : 12,
+      "expected" : "Lateral raise",
+      "firstCorrectSeconds" : 1,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 94.87593173980713,
+          "frame" : 0,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.626042366027832,
+          "frame" : 1,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.56705951690674,
+          "frame" : 2,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 22.161006927490234,
+          "frame" : 3,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.341038703918457,
+          "frame" : 4,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.569993019104004,
+          "frame" : 5,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.47896385192871,
+          "frame" : 6,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.879030227661133,
+          "frame" : 7,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.73006534576416,
+          "frame" : 8,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 25.97510814666748,
+          "frame" : 9,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.481897354125977,
+          "frame" : 10,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.064949989318848,
+          "frame" : 11,
+          "raw" : "lateral_raise"
+        }
+      ],
+      "majorityDisplay" : "Lateral raise",
+      "name" : "lateral raise",
+      "source" : "https:\/\/www.kaggle.com\/datasets\/hasyimabdillah\/workoutfitness-video#lateral raise\/lateral raise_10.mp4",
+      "subject" : "lateral_raise_1",
+      "totalFrames" : 12,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 21,
+      "correctRaw" : 23,
+      "expected" : "Lateral raise",
+      "firstCorrectSeconds" : 1,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.89195156097412,
+          "frame" : 0,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.77307891845703,
+          "frame" : 1,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.467924118041992,
+          "frame" : 2,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.58000659942627,
+          "frame" : 3,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.7899808883667,
+          "frame" : 4,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.733999252319336,
+          "frame" : 5,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.11795139312744,
+          "frame" : 6,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.730018615722656,
+          "frame" : 7,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.10400390625,
+          "frame" : 8,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 17.692089080810547,
+          "frame" : 9,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.96800708770752,
+          "frame" : 10,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.805908203125,
+          "frame" : 11,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.73006534576416,
+          "frame" : 12,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.483089447021484,
+          "frame" : 13,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 23.34606647491455,
+          "frame" : 14,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.248008728027344,
+          "frame" : 15,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 18.419981002807617,
+          "frame" : 16,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.61696147918701,
+          "frame" : 17,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.567012786865234,
+          "frame" : 18,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 21.60799503326416,
+          "frame" : 19,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 19.53303813934326,
+          "frame" : 20,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.463943481445312,
+          "frame" : 21,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 24.13499355316162,
+          "frame" : 22,
+          "raw" : "lateral_raise"
+        }
+      ],
+      "majorityDisplay" : "Lateral raise",
+      "name" : "lateral raise",
+      "source" : "https:\/\/www.kaggle.com\/datasets\/hasyimabdillah\/workoutfitness-video#lateral raise\/lateral raise_11.mp4",
+      "subject" : "lateral_raise_2",
+      "totalFrames" : 23,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 6,
+      "correctRaw" : 8,
+      "expected" : "Lateral raise",
+      "firstCorrectSeconds" : 1,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.484017372131348,
+          "frame" : 0,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 27.991056442260742,
+          "frame" : 1,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 24.868011474609375,
+          "frame" : 2,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 22.39203453063965,
+          "frame" : 3,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 29.02698516845703,
+          "frame" : 4,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 26.97598934173584,
+          "frame" : 5,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 25.468945503234863,
+          "frame" : 6,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 20.862936973571777,
+          "frame" : 7,
+          "raw" : "lateral_raise"
+        }
+      ],
+      "majorityDisplay" : "Lateral raise",
+      "name" : "lateral raise",
+      "source" : "https:\/\/www.kaggle.com\/datasets\/hasyimabdillah\/workoutfitness-video#lateral raise\/lateral raise_12.mp4",
+      "subject" : "lateral_raise_3",
+      "totalFrames" : 8,
+      "wrongDisplay" : 0
+    }
+  ],
+  "endpoint" : "https:\/\/172.20.10.3:8443\/predict",
+  "samplesPerSecond" : 2,
+  "transport" : "Native shared RecognitionRequest, PinnedTrust, RecognitionResponse, RecognitionHistory"
+}

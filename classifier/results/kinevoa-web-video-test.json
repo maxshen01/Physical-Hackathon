@@ -1,0 +1,835 @@
+{
+  "clips" : [
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Squat",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 102.32400894165039,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.953012466430664,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.51201057434082,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.031047821044922,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.423914909362793,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.573999404907227,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.796993255615234,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.919063568115234,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.754005432128906,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.540024757385254,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.748998641967773,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.77505874633789,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.41294765472412,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Squat",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/male\/squat.mp4",
+      "subject" : "male",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Squat",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.249988555908203,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.06497573852539,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.15509796142578,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.97199249267578,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.323063850402832,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.994999885559082,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.575072288513184,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.44091510772705,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.735958099365234,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.41592788696289,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.519997596740723,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.219040870666504,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 23.25594425201416,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Squat",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/female\/squat.mp4",
+      "subject" : "female",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Push-up",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.845029830932617,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 25.98404884338379,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 26.85999870300293,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.95994758605957,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.669076919555664,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.309950828552246,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.5319185256958,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.44203472137451,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.33796501159668,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.872095108032227,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.21601390838623,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.32401752471924,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.127918243408203,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Push-Up",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/male\/push-ups.mp4",
+      "subject" : "male",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Push-up",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.661022186279297,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.329096794128418,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.799901008605957,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.83101463317871,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.252968788146973,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.22805404663086,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.673015594482422,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.384099006652832,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.972946166992188,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.74001121520996,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.176913261413574,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.25392246246338,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.355965614318848,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Push-Up",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/female\/push-ups.mp4",
+      "subject" : "female",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Lateral raise",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.460988998413086,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.12601089477539,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.000006675720215,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.46699619293213,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.195033073425293,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.9060697555542,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.70806312561035,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.19908618927002,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.867969512939453,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.916964530944824,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.23604106903076,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.435955047607422,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.863988876342773,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Dumbbell Lateral Raise",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/male\/dumbbell-lateral-raise.mp4",
+      "subject" : "male",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Lateral raise",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.30501651763916,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.327951431274414,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.391013145446777,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.59891414642334,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.468022346496582,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.046975135803223,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.0659761428833,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.441987991333008,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.805980682373047,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.982959747314453,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.36197280883789,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.2570219039917,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.856955528259277,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Dumbbell Lateral Raise",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/female\/dumbbell-lateral-raise.mp4",
+      "subject" : "female",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 13,
+      "correctRaw" : 13,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.182992935180664,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.997026443481445,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.215941429138184,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.332911491394043,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.5239315032959,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.362998962402344,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.97299289703369,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.836021423339844,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.503023147583008,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.6460018157959,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.085002899169922,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.74895191192627,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.880916595458984,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Dumbbell Front Raise",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/male\/dumbbell-front-raise.mp4",
+      "subject" : "male",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 13,
+      "correctRaw" : 13,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.1959867477417,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.06807518005371,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.855048179626465,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.52107048034668,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.910884857177734,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.625974655151367,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.68791675567627,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.391085624694824,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.7689790725708,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.946958541870117,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.509984016418457,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.368005752563477,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.621994018554688,
+          "frame" : 12,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Dumbbell Front Raise",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/female\/dumbbell-front-raise.mp4",
+      "subject" : "female",
+      "totalFrames" : 13,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 14,
+      "correctRaw" : 14,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.159031867980957,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.05901527404785,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.98999309539795,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.568992614746094,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.210006713867188,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.370985984802246,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.016934394836426,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.156051635742188,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.724037170410156,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.379926681518555,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.738938331604004,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.297910690307617,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.7609920501709,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.994046211242676,
+          "frame" : 13,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "Front Plank",
+      "source" : "https:\/\/pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev\/exercise-videos\/female\/front-plank-female.mp4",
+      "subject" : "female",
+      "totalFrames" : 14,
+      "wrongDisplay" : 0
+    }
+  ],
+  "endpoint" : "https:\/\/172.20.10.3:8443\/predict",
+  "samplesPerSecond" : 2,
+  "transport" : "Native shared RecognitionRequest, PinnedTrust, RecognitionResponse, RecognitionHistory"
+}

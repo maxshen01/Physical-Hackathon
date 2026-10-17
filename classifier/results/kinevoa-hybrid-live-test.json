@@ -1,0 +1,483 @@
+{
+  "clips" : [
+    {
+      "correctDisplay" : 7,
+      "correctRaw" : 13,
+      "expected" : "Squat",
+      "firstCorrectSeconds" : 2.5,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 273.2560634613037,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 95.22604942321777,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 62.159061431884766,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 81.87711238861084,
+          "frame" : 3,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 71.45893573760986,
+          "frame" : 4,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 79.33604717254639,
+          "frame" : 5,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 72.01099395751953,
+          "frame" : 6,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 71.82705402374268,
+          "frame" : 7,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 75.40202140808105,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 79.67805862426758,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 78.39405536651611,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 94.34700012207031,
+          "frame" : 11,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 84.70094203948975,
+          "frame" : 12,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 86.17591857910156,
+          "frame" : 13,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 84.37788486480713,
+          "frame" : 14,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 106.52399063110352,
+          "frame" : 15,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 74.80299472808838,
+          "frame" : 16,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 64.797043800354,
+          "frame" : 17,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 74.15199279785156,
+          "frame" : 18,
+          "raw" : "squat"
+        },
+        {
+          "display" : "Squat",
+          "elapsedMS" : 69.09596920013428,
+          "frame" : 19,
+          "raw" : "squat"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "squat",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/squat\/1e2c254b-0d5a-4fd6-a6d4-2681333d927b.mp4",
+      "subject" : "1e2c254b-0d5a-4fd6-a6d4-2681333d927b",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 11,
+      "correctRaw" : 15,
+      "expected" : "Push-up",
+      "firstCorrectSeconds" : 3,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 70.686936378479,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 64.9939775466919,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 72.26598262786865,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 76.73490047454834,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.58896732330322,
+          "frame" : 4,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 66.25890731811523,
+          "frame" : 5,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 69.64802742004395,
+          "frame" : 6,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 63.77100944519043,
+          "frame" : 7,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 72.11804389953613,
+          "frame" : 8,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 76.19094848632812,
+          "frame" : 9,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 63.629984855651855,
+          "frame" : 10,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 78.8649320602417,
+          "frame" : 11,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 73.10795783996582,
+          "frame" : 12,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 60.41097640991211,
+          "frame" : 13,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 68.81105899810791,
+          "frame" : 14,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 73.13299179077148,
+          "frame" : 15,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 65.55402278900146,
+          "frame" : 16,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 78.87697219848633,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 84.10191535949707,
+          "frame" : 18,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 83.52398872375488,
+          "frame" : 19,
+          "raw" : "pushup"
+        }
+      ],
+      "majorityDisplay" : "Push-up",
+      "name" : "push-up",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/push-up\/01b09356-3985-474f-827f-20c79cfcda78.mp4",
+      "subject" : "01b09356-3985-474f-827f-20c79cfcda78",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 10,
+      "correctRaw" : 12,
+      "expected" : "Lateral raise",
+      "firstCorrectSeconds" : 1,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 70.04201412200928,
+          "frame" : 0,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 63.44008445739746,
+          "frame" : 1,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 62.36100196838379,
+          "frame" : 2,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 47.58501052856445,
+          "frame" : 3,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 52.17409133911133,
+          "frame" : 4,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 54.19600009918213,
+          "frame" : 5,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 54.42392826080322,
+          "frame" : 6,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 52.8789758682251,
+          "frame" : 7,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 70.6709623336792,
+          "frame" : 8,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 59.71801280975342,
+          "frame" : 9,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 54.56197261810303,
+          "frame" : 10,
+          "raw" : "lateral_raise"
+        },
+        {
+          "display" : "Lateral raise",
+          "elapsedMS" : 47.04892635345459,
+          "frame" : 11,
+          "raw" : "lateral_raise"
+        }
+      ],
+      "majorityDisplay" : "Lateral raise",
+      "name" : "lateral raise",
+      "source" : "https:\/\/www.kaggle.com\/datasets\/hasyimabdillah\/workoutfitness-video#lateral raise\/lateral raise_10.mp4",
+      "subject" : "lateral_raise_1",
+      "totalFrames" : 12,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 18,
+      "correctRaw" : 18,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 75.47903060913086,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 61.1720085144043,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.37498664855957,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 71.26402854919434,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 82.32402801513672,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.19700717926025,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 75.01602172851562,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 52.221059799194336,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 50.19700527191162,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 53.363919258117676,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 63.97593021392822,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 64.38100337982178,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.75204563140869,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.94301891326904,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 79.10490036010742,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 84.38408374786377,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 61.29598617553711,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 73.38309288024902,
+          "frame" : 17,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "shoulder press",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/shoulder press\/17496a37-c1f7-4105-9c07-e7cfbca06106.mp4",
+      "subject" : "17496a37-c1f7-4105-9c07-e7cfbca06106",
+      "totalFrames" : 18,
+      "wrongDisplay" : 0
+    }
+  ],
+  "endpoint" : "https:\/\/172.20.10.3:8443\/predict",
+  "samplesPerSecond" : 2,
+  "transport" : "Native shared RecognitionRequest, PinnedTrust, RecognitionResponse, RecognitionHistory"
+}

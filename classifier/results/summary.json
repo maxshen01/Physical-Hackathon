@@ -1,0 +1,215 @@
+{
+  "model": "/Users/soniakoszut/Documents/ChatGPT/Physical AI Hackathon/.cache/model",
+  "device": "cpu",
+  "dataset": "averrous/workout",
+  "split": "test",
+  "seed": 42,
+  "threshold": 0.65,
+  "margin": 0.15,
+  "samples": 100,
+  "raw_top1_accuracy": 0.97,
+  "target_or_unknown_accuracy": 0.96,
+  "median_inference_ms": 53.074124502018094,
+  "per_class": {
+    "lateral raises": {
+      "n": 20,
+      "raw_correct": 19,
+      "accepted_correct": 17
+    },
+    "plank": {
+      "n": 20,
+      "raw_correct": 20,
+      "accepted_correct": 20
+    },
+    "push up": {
+      "n": 20,
+      "raw_correct": 20,
+      "accepted_correct": 20
+    },
+    "shoulder press": {
+      "n": 20,
+      "raw_correct": 18,
+      "accepted_correct": 20
+    },
+    "squat": {
+      "n": 20,
+      "raw_correct": 20,
+      "accepted_correct": 19
+    }
+  },
+  "limitations": [
+    "Small sampled smoke test, not a benchmark.",
+    "Model training data not disclosed; overlap with this image dataset cannot be excluded.",
+    "No phone footage, simulator imagery, idle/walking or clinical validation in this image test.",
+    "Threshold rejection is heuristic and not calibrated open-set recognition."
+  ],
+  "video_smoke_test": {
+    "dataset": "ambarishnarayan/UFC101_Subset_Workout",
+    "split": "val",
+    "selection": "First five lexicographically sorted clips per class; 8 uniformly spaced frames; majority vote",
+    "n": 10,
+    "correct": 5,
+    "rows": [
+      {
+        "clip": "v_PushUps_g01_c04.avi",
+        "expected": "pushup",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_PushUps_g07_c02.avi",
+        "expected": "pushup",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_PushUps_g08_c04.avi",
+        "expected": "pushup",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_PushUps_g09_c04.avi",
+        "expected": "pushup",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "pushup",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_PushUps_g12_c02.avi",
+        "expected": "pushup",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "pushup",
+          "unknown",
+          "unknown",
+          "unknown",
+          "pushup",
+          "unknown",
+          "pushup",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_JumpingJack_g04_c03.avi",
+        "expected": "unknown",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_JumpingJack_g05_c03.avi",
+        "expected": "unknown",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_JumpingJack_g06_c03.avi",
+        "expected": "unknown",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_JumpingJack_g06_c05.avi",
+        "expected": "unknown",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      },
+      {
+        "clip": "v_JumpingJack_g12_c02.avi",
+        "expected": "unknown",
+        "prediction": "unknown",
+        "frames": 8,
+        "frame_labels": [
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown",
+          "unknown"
+        ]
+      }
+    ]
+  }
+}

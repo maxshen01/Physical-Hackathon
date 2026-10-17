@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+.cache/
+classifier/data/
+*.pem
+
+.env
+.env.*
+!.env.example
+
+# Local build products, machine state and runtime diagnostics
+node_modules/
+**/xcuserdata/
+*.xcuserstate
+*.log
+.srl
+classifier/results/movement_live*.json
+classifier/results/phone-setup-qr.png
+classifier/results/*inputs.jpg
+classifier/results/examples.jpg
+
+*.egg-info/
+**/build/
+**/dist/

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kinevoa-classifier"
+version = "0.1.0"
+description = "Exercise recognition service with image, movement and optional vision fallback"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy", "torch>=2.2", "transformers>=4.49,<5", "pillow",
+  "mediapipe==0.10.35", "fastapi", "uvicorn", "python-multipart",
+  "requests", "python-dotenv>=1.2,<2"
+]
+
+[project.optional-dependencies]
+evaluation = ["pandas", "pyarrow", "nbformat", "ipykernel", "nbclient", "qrcode[pil]", "opencv-contrib-python"]
+test = ["httpx"]
+
+[project.scripts]
+kinevoa-classifier = "kinevoa_classifier.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kinevoa_classifier = ["web/index.html", "web/static/*"]

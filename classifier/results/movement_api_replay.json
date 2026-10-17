@@ -1,0 +1,132 @@
+{
+  "clip": "holdout/squat/1e2c254b-0d5a-4fd6-a6d4-2681333d927b.mp4",
+  "endpoint": "https://127.0.0.1:8443",
+  "expected": "squat",
+  "correct_display_seen": true,
+  "median_round_trip_ms": 64.23929193988442,
+  "p95_round_trip_ms": 70.85083317942917,
+  "rows": [
+    {
+      "time": 0.0,
+      "exercise": "unknown",
+      "elapsed_ms": 227.73012495599687
+    },
+    {
+      "time": 0.5005000000000001,
+      "exercise": "unknown",
+      "elapsed_ms": 70.57870808057487
+    },
+    {
+      "time": 1.0010000000000001,
+      "exercise": "unknown",
+      "elapsed_ms": 60.917124850675464
+    },
+    {
+      "time": 1.5015,
+      "exercise": "squat",
+      "elapsed_ms": 69.64283413253725
+    },
+    {
+      "time": 2.0020000000000002,
+      "exercise": "squat",
+      "elapsed_ms": 73.2999590691179
+    },
+    {
+      "time": 2.5025,
+      "exercise": "squat",
+      "elapsed_ms": 62.48854217119515
+    },
+    {
+      "time": 3.003,
+      "exercise": "squat",
+      "elapsed_ms": 68.10812512412667
+    },
+    {
+      "time": 3.5035000000000003,
+      "exercise": "squat",
+      "elapsed_ms": 70.36424987018108
+    },
+    {
+      "time": 4.0040000000000004,
+      "exercise": "squat",
+      "elapsed_ms": 65.94345811754465
+    },
+    {
+      "time": 4.5045,
+      "exercise": "squat",
+      "elapsed_ms": 67.13899993337691
+    },
+    {
+      "time": 5.005,
+      "exercise": "squat",
+      "elapsed_ms": 62.85529211163521
+    },
+    {
+      "time": 5.5055000000000005,
+      "exercise": "squat",
+      "elapsed_ms": 63.32574994303286
+    },
+    {
+      "time": 6.006,
+      "exercise": "squat",
+      "elapsed_ms": 60.74504088610411
+    },
+    {
+      "time": 6.5065,
+      "exercise": "squat",
+      "elapsed_ms": 63.45883314497769
+    },
+    {
+      "time": 7.007000000000001,
+      "exercise": "squat",
+      "elapsed_ms": 67.15212482959032
+    },
+    {
+      "time": 7.5075,
+      "exercise": "squat",
+      "elapsed_ms": 64.23929193988442
+    },
+    {
+      "time": 8.008000000000001,
+      "exercise": "pushup",
+      "elapsed_ms": 63.66133387200534
+    },
+    {
+      "time": 8.5085,
+      "exercise": "squat",
+      "elapsed_ms": 60.88791601359844
+    },
+    {
+      "time": 9.009,
+      "exercise": "squat",
+      "elapsed_ms": 64.4076659809798
+    },
+    {
+      "time": 9.509500000000001,
+      "exercise": "squat",
+      "elapsed_ms": 60.492957942187786
+    }
+  ],
+  "display": [
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "squat",
+    "unknown",
+    "unknown",
+    "unknown",
+    "squat"
+  ]
+}
