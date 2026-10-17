@@ -1,4 +1,4 @@
-# Kinevoa native iOS app
+# Orbit native iOS app
 
 Open `MoveCamera.xcodeproj` in Xcode. Scheme: **MoveCamera**. Minimum iOS: **17**. Signing is set to Sonia's existing personal team and `com.soniakoszut.moveexercise`.
 
@@ -25,3 +25,9 @@ xcodebuild -project ios/MoveCamera.xcodeproj \
 ```
 
 This check passed. A physical phone is required to validate camera capture, permissions, server reachability, and exercise results. The backend classifier is experimental and may return Unknown on real-world footage.
+
+## Native movement capture
+
+After an exercise locks, tap **Capture** to collect six seconds from the existing rear-camera feed (target 10 fps, longest edge 640 px). The native app sends ordered JPEG frames and monotonic capture timestamps to the same Python server at `/capture/features`, using the existing pinned HTTPS session. Tap **Features** to view review images, per-frame values, landmark quality, unavailable reasons and full JSON. No coaching/speech is generated. Camera-angle readiness is handled elsewhere; this button does not verify it.
+
+Capture sampling and network state live on the camera queue. Stop, Re-classify and app backgrounding cancel capture, invalidate stale responses, and clear temporary results. Raw sequence frames are released after processing; review images and feature results remain in memory until cleared or the session ends. `MovementCapture.swift` contains the isolated multipart request and typed response contract; see [feature definitions](../contracts/movement-features.md). Physical-device camera/network testing is still required.

@@ -94,6 +94,11 @@ class PoseEstimator:
                 self.bounds=(min(xs),min(ys),max(xs),max(ys))
         features=extract_features(result.pose_landmarks[0],image.width,image.height,timestamp) if len(result.pose_landmarks)==1 else None
         return features, (perf_counter()-start)*1000
+    def landmarks(self, image):
+        """Return landmarks without classification or temporal recognition state."""
+        rgb = np.ascontiguousarray(np.asarray(image.convert('RGB')))
+        return self.model.detect(self.mp.Image(image_format=self.mp.ImageFormat.SRGB, data=rgb)).pose_landmarks
+
     def crop(self,image):
         if self.bounds is None:return None
         from PIL import Image

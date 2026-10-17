@@ -39,3 +39,7 @@ HF_HUB_OFFLINE=1 .venv/bin/python classifier/tools/evaluate.py
 Install the `evaluation` extra to run data tools and the notebook. See [movement report](results/MOVEMENT_REPORT.md), [combined test report](results/KINEVOA_TEST_REPORT.md), and [notebook](notebooks/experiment.ipynb). Historical reports describe their specific model versions and samples. Dataset overlap, small samples and viewpoint differences limit generalisation; these results do not establish real-world or clinical accuracy.
 
 `requirements-lock.txt` is the recorded development environment. `pyproject.toml` defines runtime dependencies and optional development extras.
+
+## Capture movement features
+
+The browser now includes **Capture** for a known exercise: six seconds of timestamped camera frames → local MediaPipe → per-frame feature JSON and up to three review images. Coaching and speech are deferred. See the [complete feature contract](../contracts/movement-features.md) for names, geometry, quality fields, limits and integration details. Camera-angle selection and readiness are outside this module.

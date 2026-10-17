@@ -1,6 +1,33 @@
 {
   "components": {
     "schemas": {
+      "Body_capture_features_capture_features_post": {
+        "properties": {
+          "exercise": {
+            "title": "Exercise",
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "contentMediaType": "application/octet-stream",
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "timestamps": {
+            "title": "Timestamps",
+            "type": "string"
+          }
+        },
+        "required": [
+          "exercise",
+          "timestamps",
+          "files"
+        ],
+        "title": "Body_capture_features_capture_features_post",
+        "type": "object"
+      },
       "Body_predict_predict_post": {
         "properties": {
           "file": {
@@ -236,6 +263,42 @@
           }
         },
         "summary": "Home"
+      }
+    },
+    "/capture/features": {
+      "post": {
+        "operationId": "capture_features_capture_features_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_capture_features_capture_features_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Capture Features"
       }
     },
     "/diagnostics": {

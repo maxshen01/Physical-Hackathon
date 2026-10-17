@@ -1,12 +1,14 @@
 """Frame-upload API. Phone/simulation use the same POST /predict contract."""
 import io
+import json
+import math
 import threading
 from collections import deque
 from time import time
 from fastapi import Request
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
@@ -75,6 +77,48 @@ def create_app(classifier_factory=HybridClassifier, vision_factory=VisionFallbac
         for name in ('display_name','source','cloud_status','cloud_checks','cloud_confirmed','preview_label','preview_score','preview_source'):
             if name in result and (key or name == 'display_name'):response[name]=result[name]
         return response
+
+    @app.post('/capture/features')
+    def capture_features(exercise: str = Form(...), timestamps: str = Form(...), files: list[UploadFile] = File(...)):
+        from .capture import METRICS, extract_pose_features, summarize
+        if exercise not in METRICS:
+            raise HTTPException(400, 'Select a supported known exercise')
+        try:
+            times = json.loads(timestamps)
+            if not isinstance(times, list) or len(times) != len(files) or not 3 <= len(times) <= 90:
+                raise ValueError()
+            if any(type(t) not in (int, float) or not math.isfinite(t) or t < 0 for t in times): raise ValueError()
+            if any(b <= a for a,b in zip(times,times[1:])) or times[-1] > 10000: raise ValueError()
+        except (ValueError, TypeError):
+            raise HTTPException(400, 'Provide 3–90 ordered frame timestamps within 10 seconds')
+        images = []
+        total = 0
+        try:
+            # Validate the entire batch before invoking the model. Never write media to disk.
+            for upload in files:
+                payload = upload.file.read(1024*1024+1)
+                total += len(payload)
+                if len(payload) > 1024*1024 or total > 24*1024*1024:
+                    raise HTTPException(413, 'Capture too large (1 MB per frame, 24 MB total)')
+                try:
+                    with Image.open(io.BytesIO(payload)) as image:
+                        if image.format not in ('JPEG','PNG'): raise ValueError()
+                        if image.width*image.height > 2_000_000: raise HTTPException(413, 'Capture frame resolution too large')
+                        images.append(image.convert('RGB'))
+                except (ValueError, UnidentifiedImageError, OSError, Image.DecompressionBombError):
+                    raise HTTPException(400, 'Capture contains an empty, unsupported or corrupt frame')
+            frames = []
+            with lock:
+                for image, timestamp in zip(images,times):
+                    try:
+                        poses = app.state.model.pose.landmarks(image)
+                    except Exception:
+                        raise HTTPException(503, 'Local pose extraction failed. Please try capturing again.') from None
+                    frames.append(extract_pose_features(poses,image.width,image.height,timestamp,exercise))
+            return summarize(exercise,frames)
+        finally:
+            for image in images: image.close()
+            for upload in files: upload.file.close()
 
     @app.get('/diagnostics')
     def diagnostics(request: Request):
