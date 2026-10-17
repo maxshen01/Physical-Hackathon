@@ -13,14 +13,7 @@ An iPhone demo with one guided flow:
 
 The live camera is used for recognition and placement; no video recording is saved. A captured image is one pose, not a start/peak/finish sequence or a verified repetition. The app never fabricates those stages. Single-image feedback avoids depth/range targets and clinical joint-angle claims.
 
-## Video
-
-https://github.com/user-attachments/assets/ce7cd36e-4c0b-47e2-a90e-cf0711676d10
-
 ## Start the demo
-
-
-https://github.com/user-attachments/assets/15aa974f-add0-4d9f-8bfb-19875ae08429
 
 
 Use Python 3.11 and Xcode 26 (iOS 17+):
