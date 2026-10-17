@@ -5,8 +5,8 @@ struct ContentView: View {
     private let signal = Color(red: 0.79, green: 0.98, blue: 0.10)
     private let panel = Color(red: 0.12, green: 0.14, blue: 0.17)
     @StateObject private var camera = CameraModel()
-    /// Combined demo server on this Mac (Personal Hotspot address).
-    private let address = "https://172.20.10.3:8443"
+    /// Combined demo server on this Mac (Wi-Fi address).
+    private let address = "https://10.217.1.88:8443"
     @State private var heightText = "170"
     @State private var setupMarker: FloorMarker = .bottom
     @State private var facingOverride: FloorMarker?
