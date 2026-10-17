@@ -10,7 +10,7 @@ An iPhone demo with one guided flow:
 The live camera is used for recognition and placement; no video recording is saved. A captured image is one pose, not a start/peak/finish sequence or a verified repetition. The app never fabricates those stages. Single-image feedback avoids depth/range targets and clinical joint-angle claims.
 
 ## Video
-[Watch the video](https://example.com/your-video-link)
+[Watch the demo video](../demo-video/orbit-demo.mp4)
 
 ## Start the demo
 
