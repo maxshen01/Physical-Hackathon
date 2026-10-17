@@ -59,4 +59,4 @@ echo "Never transfer files containing 'key'."
 echo "Open https://$PHONE_HOST:$PHONE_PORT on your phone (same Wi-Fi)."
 if [ "${PHONE_CERT_ONLY:-0}" = 1 ]; then exit 0; fi
 cd "$ROOT"
-exec "$ROOT/.venv/bin/python" -m uvicorn kinevoa_classifier.api:app --host 0.0.0.0 --port "$PHONE_PORT" --ssl-certfile "$TLS_DIR/phone.pem" --ssl-keyfile "$TLS_DIR/phone-key.pem"
+exec "$ROOT/.venv/bin/python" -m uvicorn "${DEMO_APP:-demo:app}" --host 0.0.0.0 --port "$PHONE_PORT" --ssl-certfile "$TLS_DIR/phone.pem" --ssl-keyfile "$TLS_DIR/phone-key.pem"

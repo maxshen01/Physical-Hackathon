@@ -1,11 +1,10 @@
 # On-device camera placement
 
 The iPhone app uses the rear camera and Apple's Vision 3D body pose request to
-estimate a person's direction every 0.45 seconds. All inference and photo
-capture run on the phone; no setup frames, photos, or keys are sent to a server.
-The photo stays in memory for preview and is discarded when dismissed or when
-the camera stops. This feature suggests camera placement only; it does not
-assess exercise form.
+estimate a person's direction every 0.45 seconds. Heading inference runs on the phone. The integrated app first recognises the
+exercise through the demo server, then uses this placement engine. After moving,
+the captured image goes to the server for features and voice feedback. Images
+stay in memory and are discarded after review; provider keys remain server-side.
 
 ## Floor marks and setup
 
@@ -24,13 +23,12 @@ Start with the phone at mark **5** (the sketch's CAMERA mark), or choose the
 actual setup mark in the app. Aim the rear camera at one fully visible person,
 holding it upright in portrait. The setup mark matters because body direction
 from an image is relative to the camera. Keep the phone there until a stable
-recommendation appears, then tap **Lock placement** before moving it. Put the
+recommendation appears, then tap **Use this position** before moving it. Put the
 phone at the highlighted mark, set its **lens** to the shown height above the
-floor, and tap **Take photo**. The app stores no photo history.
+floor, and tap **Capture image**. The app stores no photo history.
 
 The recommendation shows the direction inferred from the setup image. If that
-direction is wrong, choose the correct floor mark in **Subject faces (if
-estimate is wrong)**. The recommendation is recalculated on the phone using
+direction is wrong, choose the correct floor mark in **Person faces** under **Placement options**. The recommendation is recalculated on the phone using
 the same fixed preset. Select **Automatic** to try live detection again.
 
 ## Fixed presets
@@ -43,7 +41,7 @@ the same fixed preset. Select **Automatic** to try live detection again.
 
 The app chooses the nearest available mark to the desired view. Both sides
 are acceptable for a side view; if they tie, it chooses the side closest to
-the setup mark. The exercise is selected from the fixed list already supported
+the setup mark. The exercise is recognised from the fixed list already supported
 by the branch. Height is entered in centimetres. These ratios are starting
 presets, not measured optima. The distance of each floor mark and the phone's
 field of view still need physical calibration so the whole person fits in the
@@ -81,6 +79,7 @@ xcodebuild -quiet -project ios/MoveCamera.xcodeproj \
   -derivedDataPath .cache/ios-placement-build CODE_SIGNING_ALLOWED=NO build
 ```
 
-The iOS app target compiles only the new placement camera code and does not
-include the older network recognition classes or the bundled server CA. The
-Python classifier is retained in its own folder for separate experiments.
+The iOS app target includes the placement engine, recognition client, bundled
+public server CA, image capture and voice feedback. `PlacementCameraModel.swift`
+is retained as the standalone placement implementation; the integrated
+`CameraModel.swift` owns the single camera session across all steps.

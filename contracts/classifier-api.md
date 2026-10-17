@@ -42,3 +42,11 @@ The native app uses HTTPS with hostname validation and the bundled public CA cer
 `GET /health` reports readiness, model device and whether cloud configuration is enabled. `GET /diagnostics` is loopback-only and returns bounded decision metadata. `/` and `/static/` serve the optional browser client.
 
 The service does not persist uploaded frames. Provider keys stay on the server. Configured cloud fallback sends selected in-memory frames to OpenAI; see [provider setup](../classifier/docs/OPENAI_FALLBACK.md).
+
+## Single-image capture
+
+`POST /capture/image`: multipart `exercise` (`squat`, `pushup`, `lateral_raise`) and `file` (one JPEG/PNG, ≤1 MB, ≤2 million pixels). The entire image is validated before pose extraction. Errors: 400 for empty/corrupt/unsupported images or exercise IDs, 413 for size/resolution limits, 503 for extraction failure. Image objects and uploaded files are closed on success and failure; no application media files are written.
+
+The response uses the movement-feature envelope with exactly one `frames` entry at `timestamp_ms: 0`, `measurement_space: "2d_image_plane"`, and `complete_repetition_verified: false`. Feature values include landmark quality and missing-value reasons. One image does not imply a movement peak. Orbit sends quality-checked values as one `capture` snapshot to `POST /api/feedback`; it never invents three stages.
+
+The root `demo:app` combines classifier routes and feedback routes on the same HTTPS origin. The standalone classifier's OpenAPI snapshot excludes feedback routes; the combined server exposes its complete schema at `/openapi.json`.

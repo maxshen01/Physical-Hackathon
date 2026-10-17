@@ -1,5 +1,9 @@
 # Physio video coach: project instructions
 
+## Current integrated demo flow
+
+The user revised the demo workflow on 2026-10-17: start the camera, classify the exercise, recommend the best available floor-mark angle, move the phone, capture one image, extract features, run the LLM, then speak feedback. Voice is the primary output, with a transcript available if speech fails. Treat this single-image flow as the current integration scope; the completed-video workflow below remains a future product requirement. Never fabricate start/peak/finish measurements from one image or claim that a still image verifies a repetition. Keep the safety, validation, server-side credentials and cleanup rules below.
+
 ## Purpose and first version
 
 Build a patient-facing tool that accepts a completed video of a physiotherapy exercise and the exercise name. A Python backend analyses the movement with a vision-capable GPT model through the OpenAI API, then uses ElevenLabs to speak brief, practical feedback. In this project, "ChatGPT" means an OpenAI API model, not the ChatGPT web app. Keep the model ID configurable.

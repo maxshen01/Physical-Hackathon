@@ -1,35 +1,15 @@
 # Orbit native iOS app
 
-Open `MoveCamera.xcodeproj` in Xcode. Scheme: **MoveCamera**. Minimum iOS: **17**.
-The app now guides on-device camera placement for the branch's fixed exercise
-set: Squat, Push-up, and Lateral raise. Choose the exercise, enter the subject's
-height, select the physical setup mark, and start the rear camera. A stable
-direction estimate highlights one of eight floor marks, gives a lens height,
-and estimates the camera's angle clockwise from the subject's facing direction.
-Lock the recommendation before moving the phone, then take a photo. The photo
-is previewed in memory and is not saved by the app. The recommendation shows
-its inferred facing direction. If it is wrong, select the actual direction in
-**Subject faces (if estimate is wrong)**, or select **Automatic** to resume
-live detection.
+Open `MoveCamera.xcodeproj`, scheme **MoveCamera**, iOS 17+. The app includes recognition networking, on-device camera placement, photo capture and voice feedback in one flow. Orbit's dark background, lime actions, native text and floor-mark diagram remain consistent throughout.
 
-All live pose inference uses Apple Vision on the iPhone. The iOS target has no
-HTTP client, server address, provider key, model download, or local network
-permission. The older `CameraModel.swift`, `MovementCapture.swift`, and
-`RecognitionProtocol.swift` remain in the repository for the separate
-recognition experiment but are excluded from the app target. Sonia's Orbit
-branding assets remain included in the app target.
+**Start recording → recognise exercise → recommend position → Use this position → move phone → Capture image → extract features → LLM → automatic speech.**
 
-See [camera placement](../camera_placement/README.md) for the mark numbering,
-presets, assumptions, tests, and physical validation required. The Python
-classifier remains a separate experiment and is not used by the iOS app.
+No saved video is created. Recognition streams bounded frames to the HTTPS server until the exercise locks. Apple Vision then estimates facing locally. Position confirmation freezes the recommendation before moving the phone. A real photo is captured, resized to ≤1280 px, uploaded for image-plane features, and discarded after review. The signed camera angle comes from the frozen floor-mark recommendation, not the phone's current preview. Moving to the recommended mark is a manual step.
 
-Unsigned build check:
+One image is encoded as **one `capture` snapshot**, never duplicated into fake start/peak/finish stages. The app drops unavailable, low-quality and nonfinite measurements. The server validates the payload and cue selection. The voice screen starts its request automatically, plays the returned MP3, and offers replay/stop. An audio failure preserves the transcript. Closing the screen cancels requests and releases audio. Stopping/backgrounding clears the capture and resets the flow.
 
-```sh
-xcodebuild -quiet -project ios/MoveCamera.xcodeproj \
-  -scheme MoveCamera -sdk iphonesimulator -configuration Debug \
-  -derivedDataPath .cache/ios-placement-build CODE_SIGNING_ALLOWED=NO build
-```
+The gear menu accepts one HTTPS demo address. Leave the optional separate feedback address blank to use the combined backend. The local demo connection uses the bundled public CA with hostname validation and rejects redirects. A separate feedback service uses normal system HTTPS trust. Provider credentials are never entered in the app.
 
-A physical iPhone is needed to validate camera permissions, frame orientation,
-3D pose direction, photo capture, and all eight subject headings.
+See the root [README](../README.md) for server setup, public certificate copy, build and test commands. Camera permission and local-network permission are required; no microphone or Photos-library permission is requested. **Placement options** contains height, setup mark and manual facing correction. Controls are disabled while a photo is being processed, while Stop remains available to cancel.
+
+Test recognition, Apple Vision orientation for all eight headings, actual movement to the selected mark, capture and audible playback on a physical iPhone. Simulator build and mocked API tests cannot verify these physical steps.

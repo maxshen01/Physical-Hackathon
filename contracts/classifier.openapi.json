@@ -28,6 +28,25 @@
         "title": "Body_capture_features_capture_features_post",
         "type": "object"
       },
+      "Body_capture_image_capture_image_post": {
+        "properties": {
+          "exercise": {
+            "title": "Exercise",
+            "type": "string"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "exercise",
+          "file"
+        ],
+        "title": "Body_capture_image_capture_image_post",
+        "type": "object"
+      },
       "Body_predict_predict_post": {
         "properties": {
           "file": {
@@ -299,6 +318,42 @@
           }
         },
         "summary": "Capture Features"
+      }
+    },
+    "/capture/image": {
+      "post": {
+        "operationId": "capture_image_capture_image_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_capture_image_capture_image_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Capture Image"
       }
     },
     "/diagnostics": {

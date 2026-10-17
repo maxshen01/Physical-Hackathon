@@ -120,6 +120,38 @@ def create_app(classifier_factory=HybridClassifier, vision_factory=VisionFallbac
             for image in images: image.close()
             for upload in files: upload.file.close()
 
+    @app.post('/capture/image')
+    def capture_image(exercise: str = Form(...), file: UploadFile = File(...)):
+        from .capture import METRICS, extract_pose_features, summarize
+        images = []
+        try:
+            if exercise not in METRICS:
+                raise HTTPException(400, 'Select a supported known exercise')
+            payload = file.file.read(1024*1024+1)
+            if len(payload) > 1024*1024:
+                raise HTTPException(413, 'Image too large (1 MB maximum)')
+            try:
+                with Image.open(io.BytesIO(payload)) as image:
+                    if image.format not in ('JPEG', 'PNG'):
+                        raise ValueError()
+                    if image.width*image.height > 2_000_000:
+                        raise HTTPException(413, 'Image resolution too large')
+                    images.append(image.convert('RGB'))
+            except (ValueError, UnidentifiedImageError, OSError, Image.DecompressionBombError):
+                raise HTTPException(400, 'Capture an image in JPEG or PNG format; this image is empty, unsupported or corrupt')
+            image = images[0]
+            with lock:
+                try:
+                    poses = app.state.model.pose.landmarks(image)
+                except Exception:
+                    raise HTTPException(503, 'Feature extraction failed. Please capture again.') from None
+            frame = extract_pose_features(poses, image.width, image.height, 0, exercise)
+            return summarize(exercise, [frame])
+        finally:
+            for image in images:
+                image.close()
+            file.file.close()
+
     @app.get('/diagnostics')
     def diagnostics(request: Request):
         if request.client.host not in ('127.0.0.1', '::1', 'testclient'):

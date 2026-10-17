@@ -4,205 +4,250 @@ import SwiftUI
 struct ContentView: View {
     private let signal = Color(red: 0.79, green: 0.98, blue: 0.10)
     private let panel = Color(red: 0.12, green: 0.14, blue: 0.17)
-    @StateObject private var camera = PlacementCameraModel()
-    @State private var exercise: PlacementExercise = .squat
+    @StateObject private var camera = CameraModel()
+    @AppStorage("backendAddress") private var address = ""
+    @AppStorage("feedbackAddress") private var feedbackAddress = ""
+    @State private var settings = false
     @State private var heightText = "170"
     @State private var setupMarker: FloorMarker = .bottom
     @State private var facingOverride: FloorMarker?
     @Environment(\.scenePhase) private var scenePhase
 
     private var heightCM: Double { Double(heightText) ?? 0 }
+    private var title: String {
+        switch camera.step {
+        case .recognise: camera.running ? "Let’s recognise your exercise" : "Ready when you are"
+        case .position: "Find your camera position"
+        case .capture: "Move the phone, then capture"
+        case .processing: "Reading your image"
+        case .review: "Your voice feedback"
+        }
+    }
+    private var stepNumber: Int {
+        switch camera.step {
+        case .recognise: 1
+        case .position: 2
+        case .capture, .processing: 3
+        case .review: 4
+        }
+    }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Image("OrbitLogo")
-                    .resizable().scaledToFit().frame(width: 160, height: 60, alignment: .leading)
-                    .accessibilityLabel("Orbit")
-                Text("CAMERA PLACEMENT").font(.caption.bold()).tracking(2).foregroundStyle(signal)
-
-                PlacementCameraPreview(session: camera.session)
-                    .overlay(alignment: .topLeading) {
-                        if camera.running {
-                            Text(camera.locked ? "PLACEMENT LOCKED" : "LIVE SETUP")
-                                .font(.caption.bold()).padding(9)
-                                .foregroundStyle(.black)
-                                .background(signal, in: Capsule()).padding()
-                        }
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    Image("OrbitLogo").resizable().scaledToFit().frame(width: 140, height: 48)
+                        .accessibilityLabel("Orbit")
+                    Spacer()
+                    Button { settings = true } label: { Image(systemName: "gearshape").padding(12) }
+                        .accessibilityLabel("Connection settings")
+                        .disabled(camera.running)
+                }
+                HStack(spacing: 8) {
+                    ForEach(Array(["Recognise", "Position", "Capture", "Listen"].enumerated()), id: \.offset) { index, name in
+                        Text("\(index + 1) \(name)").font(.caption.weight(index + 1 == stepNumber ? .bold : .regular))
+                            .foregroundStyle(index + 1 == stepNumber ? signal : .secondary)
+                            .frame(maxWidth: .infinity)
                     }
+                }.accessibilityLabel("Step \(stepNumber) of 4")
+                Text(title).font(.title2.bold())
+                CameraPreview(session: camera.session)
+                    .frame(height: 280)
                     .overlay {
                         if !camera.running {
                             VStack(spacing: 10) {
                                 Image(systemName: "camera.viewfinder").font(.largeTitle)
-                                Text("Stand at your chosen setup mark.\nKeep the person fully in view.")
+                                Text("Keep your whole body in view.\nStart, then perform your exercise slowly.")
                                     .multilineTextAlignment(.center)
-                            }.foregroundStyle(.white)
+                            }.padding().foregroundStyle(.white)
+                        }
+                    }
+                    .overlay(alignment: .topLeading) {
+                        if camera.labelLocked {
+                            Label(camera.exercise, systemImage: "checkmark.circle.fill")
+                                .font(.subheadline.bold()).padding(10)
+                                .foregroundStyle(.black).background(signal, in: Capsule()).padding(12)
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .frame(height: 275)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    Picker("Exercise", selection: $exercise) {
-                        ForEach(PlacementExercise.allCases) { item in Text(item.title).tag(item) }
-                    }
-                    HStack {
-                        Text("Subject height")
-                        Spacer()
-                        TextField("170", text: $heightText)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 75)
-                            .textFieldStyle(.roundedBorder)
-                        Text("cm")
-                    }
-                    Picker("Setup camera mark", selection: $setupMarker) {
-                        ForEach(FloorMarker.allCases) { mark in
-                            Text("\(mark.number) · \(mark.title)").tag(mark)
-                        }
-                    }
-                    Picker("Subject faces (if estimate is wrong)", selection: $facingOverride) {
-                        Text("Automatic").tag(nil as FloorMarker?)
-                        ForEach(FloorMarker.allCases) { mark in
-                            Text("\(mark.number) · \(mark.title)").tag(Optional(mark))
-                        }
-                    }
-                }
-                .padding(14)
-                .background(panel, in: RoundedRectangle(cornerRadius: 16))
-
-                VStack(alignment: .leading, spacing: 10) {
-                    if let result = camera.recommendation {
-                        Text(result.summary).font(.title2.bold())
-                        if let facingOverride {
-                            Text("Corrected facing: mark \(facingOverride.number) · \(facingOverride.title)")
-                                .font(.subheadline).foregroundStyle(.secondary)
-                        } else {
-                            Text("Estimated facing: mark \(Int((result.subjectHeadingDegrees / 45).rounded()) % 8 + 1) · \(Int(result.subjectHeadingDegrees.rounded()))°")
-                                .font(.subheadline).foregroundStyle(.secondary)
-                        }
-                        Text("Place the phone at mark \(result.marker.number). Set the camera lens \(result.cameraHeightCM) cm above the floor.")
-                        Text("Approx. camera angle: \(result.approximateCameraAngleDegrees)° clockwise from the subject’s facing direction")
-                            .font(.subheadline)
-                        Text("\(result.exercise.view) view · \(Int(result.exercise.heightFraction * 100))% of subject height")
-                            .font(.caption).foregroundStyle(.secondary)
-                    } else {
-                        Text("Waiting for a clear direction").font(.title3.bold())
-                        Text("A position appears after the phone sees a steady, full-body pose from the setup mark.")
-                            .font(.subheadline).foregroundStyle(.secondary)
-                    }
-                    FloorMap(selected: camera.recommendation?.marker, setup: setupMarker)
-                        .frame(height: 175)
-                }
-                .padding(16)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(panel, in: RoundedRectangle(cornerRadius: 16))
-
-                HStack(spacing: 10) {
-                    Button(camera.running ? "Stop" : "Start setup camera") {
-                        if camera.running { camera.stop() }
-                        else { camera.start(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(signal)
-                    .frame(maxWidth: .infinity)
+                if camera.step == .recognise {
                     if camera.running {
-                        Button(camera.locked ? "Scan again" : "Lock placement") {
-                            if camera.locked { camera.scanAgain(); facingOverride = nil }
-                            else { camera.lockPlacement() }
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(!camera.locked && camera.recommendation == nil)
+                        Text(camera.exercise == "Unknown" ? "Looking for squat, push-up or lateral raise…" : "Recognising \(camera.exercise.lowercased())…")
+                            .font(.headline)
+                        ProgressView(value: camera.confidence).tint(signal)
+                        Text("Keep moving until the exercise is recognised. No video is saved.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    } else {
+                        Text("Recognise your exercise, position your phone, and hear a short review of your captured pose.")
+                            .foregroundStyle(.secondary)
                     }
                 }
-                if camera.locked {
-                    Button("Take photo") { camera.capturePhoto() }
-                        .buttonStyle(.borderedProminent)
-                        .tint(signal)
-                        .frame(maxWidth: .infinity)
+                if camera.labelLocked {
+                    if let result = camera.recommendation {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(result.summary).font(.title3.bold())
+                            Text("\(result.exercise.view) view · lens \(result.cameraHeightCM) cm above the floor")
+                            if let facingOverride {
+                                Text("Corrected facing: mark \(facingOverride.number) · \(facingOverride.title)")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            } else {
+                                Text("Estimated facing: mark \(Int((result.subjectHeadingDegrees / 45).rounded()) % 8 + 1) · \(Int(result.subjectHeadingDegrees.rounded()))°")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                            Text("Approx. camera angle: \(result.approximateCameraAngleDegrees)° clockwise from facing")
+                                .font(.footnote).foregroundStyle(.secondary)
+                            FloorMap(selected: result.marker, setup: setupMarker).frame(height: 160)
+                        }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
+                    } else {
+                        Text("Hold steady at your setup mark. Keep the whole body visible while we estimate the facing direction.")
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                Text(camera.message).font(.footnote).foregroundStyle(.secondary)
-                    .accessibilityAddTraits(.updatesFrequently)
-                Text("Camera placement only. If an exercise causes pain or conflicts with your prescribed plan, stop and consult your physiotherapist.")
-                    .font(.caption2).foregroundStyle(.secondary)
-            }
-            .padding(20)
+                if camera.step == .recognise || camera.step == .position {
+                    DisclosureGroup("Placement options") {
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Person’s height")
+                                Spacer()
+                                TextField("170", text: $heightText).keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing).frame(width: 70).textFieldStyle(.roundedBorder)
+                                    .accessibilityLabel("Height in centimetres")
+                                Text("cm")
+                            }
+                            Picker("Setup camera mark", selection: $setupMarker) {
+                                ForEach(FloorMarker.allCases) { mark in Text("\(mark.number) · \(mark.title)").tag(mark) }
+                            }
+                            Picker("Person faces", selection: $facingOverride) {
+                                Text("Automatic").tag(nil as FloorMarker?)
+                                ForEach(FloorMarker.allCases) { mark in Text("\(mark.number) · \(mark.title)").tag(Optional(mark)) }
+                            }
+                            Text("Start at the selected floor mark. Correct the facing direction if the estimate is wrong.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }.padding(.top, 10)
+                    }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
+                }
+                if camera.step == .processing {
+                    HStack { ProgressView().tint(signal); Text(camera.message) }.padding(.vertical)
+                        .accessibilityAddTraits(.updatesFrequently)
+                } else {
+                    Button(action: primaryAction) {
+                        Text(primaryLabel).fontWeight(.semibold).frame(maxWidth: .infinity).padding(.vertical, 10)
+                    }
+                    .buttonStyle(.borderedProminent).tint(signal).foregroundStyle(.black)
+                    .disabled((camera.step == .position && camera.recommendation == nil) || (camera.step == .recognise && camera.running))
+                    if camera.step != .recognise || !camera.running {
+                        Text(camera.message).font(.footnote).foregroundStyle(.secondary)
+                            .accessibilityAddTraits(.updatesFrequently)
+                    } else {
+                        Text(camera.message).font(.footnote).foregroundStyle(.secondary)
+                    }
+                }
+                if camera.running {
+                    HStack {
+                        Button("Start over") { facingOverride = nil; camera.reclassify() }
+                        Spacer()
+                        Button("Stop") { camera.stop() }
+                    }.font(.subheadline)
+                }
+                Text("If an exercise causes pain or conflicts with your prescribed plan, stop and consult your physiotherapist.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }.padding(20)
         }
         .background(Color(red: 0.07, green: 0.08, blue: 0.10))
-        .preferredColorScheme(.dark)
-        .onChange(of: exercise) { _, value in camera.update(exercise: value, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
-        .onChange(of: heightText) { _, _ in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride) }
-        .onChange(of: setupMarker) { _, value in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: value, facingOverride: facingOverride) }
-        .onChange(of: facingOverride) { _, value in camera.update(exercise: exercise, heightCM: heightCM, setupMarker: setupMarker, facingOverride: value) }
+        .preferredColorScheme(.dark).tint(signal)
+        .onChange(of: heightText) { _, _ in updatePlacement() }
+        .onChange(of: setupMarker) { _, _ in updatePlacement() }
+        .onChange(of: facingOverride) { _, _ in updatePlacement() }
         .onChange(of: scenePhase) { _, phase in if phase != .active { camera.stop() } }
-        .sheet(isPresented: Binding(
-            get: { camera.capturedPhoto != nil },
-            set: { if !$0 { camera.clearPhoto() } }
-        )) {
+        .sheet(isPresented: $settings) {
             NavigationStack {
-                Group {
-                    if let photo = camera.capturedPhoto {
-                        Image(uiImage: photo).resizable().scaledToFit()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.black)
+                Form {
+                    Section("Demo server") {
+                        TextField("https://192.168.1.42:8443", text: $address)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                        Text("Use the laptop’s HTTPS address on the same Wi-Fi. The combined server handles recognition, image features and voice feedback.")
                     }
-                }
-                .navigationTitle("Captured photo")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { camera.clearPhoto() }
-                } }
-            }
+                    Section("Separate feedback server (optional)") {
+                        TextField("Leave blank to use the demo server", text: $feedbackAddress)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                        Text("Use a publicly trusted HTTPS address for a separately hosted feedback service.")
+                    }
+                    Section("Before you start") {
+                        Text("Camera frames go to the demo server for recognition. If configured, its AI fallback sends selected frames to OpenAI. After capture, only the extracted measurements go to the feedback model, and approved words go to ElevenLabs. No media history is kept by this app. Provider retention depends on account settings.")
+                    }
+                }.navigationTitle("Connection")
+                    .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { settings = false } } }
+            }.preferredColorScheme(.dark)
         }
+        .sheet(item: $camera.reviewInput, onDismiss: {
+            camera.clearCapture()
+        }) { input in
+            FeedbackReviewView(input: input, baseAddress: feedbackAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? address : feedbackAddress,
+                               usesDemoTrust: feedbackAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
+
+    private var primaryLabel: String {
+        switch camera.step {
+        case .recognise: camera.running ? "Recognising…" : "Start recording"
+        case .position: "Use this position"
+        case .capture: "Capture image"
+        case .processing: "Processing…"
+        case .review: "Capture another image"
+        }
+    }
+    private func primaryAction() {
+        switch camera.step {
+        case .recognise:
+            guard !camera.running else { return }
+            if address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { settings = true }
+            else { updatePlacement(); camera.start(address: address) }
+        case .position: camera.lockPlacement()
+        case .capture, .review: camera.captureImage()
+        case .processing: break
+        }
+    }
+    private func updatePlacement() {
+        camera.configurePlacement(heightCM: heightCM, setupMarker: setupMarker, facingOverride: facingOverride)
     }
 }
 
 private struct FloorMap: View {
     let selected: FloorMarker?
     let setup: FloorMarker
-
     var body: some View {
         GeometryReader { geometry in
             let centre = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
             let radius = min(geometry.size.width * 0.36, geometry.size.height * 0.39)
-            Text("SUBJECT")
-                .font(.caption.bold())
-                .position(centre)
+            Text("YOU").font(.caption.bold()).position(centre)
             ForEach(FloorMarker.allCases) { mark in
-                Text("\(mark.number)")
-                    .font(.caption.bold())
+                Text("\(mark.number)").font(.caption.bold())
                     .foregroundStyle(selected == mark ? .black : .white)
                     .frame(width: 30, height: 30)
                     .background(selected == mark ? Color(red: 0.79, green: 0.98, blue: 0.10) : Color.gray.opacity(0.25), in: Circle())
-                    .overlay { if setup == mark { Circle().stroke(.cyan, lineWidth: 2) } }
+                    .overlay { if setup == mark { Circle().stroke(.secondary, lineWidth: 1) } }
                     .position(x: centre.x + radius * mark.horizontal, y: centre.y + radius * mark.vertical)
                     .accessibilityLabel("Mark \(mark.number), \(mark.title)\(selected == mark ? ", recommended" : "")\(setup == mark ? ", setup camera" : "")")
             }
-        }
-        .accessibilityElement(children: .contain)
+        }.accessibilityElement(children: .contain)
     }
 }
 
-private struct PlacementCameraPreview: UIViewRepresentable {
+private struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
-    func makeUIView(context: Context) -> PlacementPreviewView {
-        let view = PlacementPreviewView()
-        view.preview.session = session
-        view.preview.videoGravity = .resizeAspect
+    func makeUIView(context: Context) -> PreviewView {
+        let view = PreviewView(); view.preview.session = session; view.preview.videoGravity = .resizeAspect
         return view
     }
-    func updateUIView(_ uiView: PlacementPreviewView, context: Context) {}
+    func updateUIView(_ uiView: PreviewView, context: Context) {}
 }
-
-private final class PlacementPreviewView: UIView {
+private final class PreviewView: UIView {
     override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
     var preview: AVCaptureVideoPreviewLayer { layer as! AVCaptureVideoPreviewLayer }
     override init(frame: CGRect) { super.init(frame: frame); backgroundColor = .black }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     override func layoutSubviews() {
         super.layoutSubviews()
-        if let connection = preview.connection, connection.isVideoRotationAngleSupported(90) {
-            connection.videoRotationAngle = 90
-        }
+        if let connection = preview.connection, connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
     }
 }

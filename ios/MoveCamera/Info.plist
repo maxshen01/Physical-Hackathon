@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>
 <key>CFBundleDevelopmentRegion</key><string>en</string><key>CFBundleExecutable</key><string>$(EXECUTABLE_NAME)</string><key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string><key>CFBundleInfoDictionaryVersion</key><string>6.0</string><key>CFBundleName</key><string>Orbit</string><key>CFBundleDisplayName</key><string>Orbit</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>1.0</string><key>CFBundleVersion</key><string>3</string>
-<key>NSCameraUsageDescription</key><string>Orbit uses your rear camera to find a photo position and take a photo on this phone.</string>
+<key>NSCameraUsageDescription</key><string>Orbit uses your rear camera to recognise your exercise, recommend a position and capture an image for voice feedback.</string>
+<key>NSLocalNetworkUsageDescription</key><string>Orbit connects to your demo server over Wi-Fi to recognise exercises, extract image features and generate voice feedback.</string>
 <key>UILaunchScreen</key><dict/><key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string></array><key>UIRequiresFullScreen</key><true/><key>UIRequiredDeviceCapabilities</key><array><string>arm64</string></array><key>UIApplicationSupportsIndirectInputEvents</key><true/>
 </dict></plist>

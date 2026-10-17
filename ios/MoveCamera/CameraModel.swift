@@ -3,8 +3,25 @@ import Foundation
 import UIKit
 import Security
 
-final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
+final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCapturePhotoCaptureDelegate, @unchecked Sendable {
+    enum Step { case recognise, position, capture, processing, review }
     let session = AVCaptureSession()
+    @Published private(set) var step: Step = .recognise
+    @Published private(set) var recommendation: PlacementRecommendation?
+    @Published var reviewInput: FeedbackRequest?
+    private let photoOutput = AVCapturePhotoOutput()
+    private let placementPose = OnDevicePoseHeading()
+    private var placementExercise: PlacementExercise?
+    private var heightCM: Double = 170
+    private var setupMarker: FloorMarker = .bottom
+    private var facingOverride: FloorMarker?
+    private var headings = HeadingWindow()
+    private var placementLocked = false
+    private var photoPending = false
+    private var lastHeadingTime = Date.distantPast
+    private var lastGoodHeading = Date.distantPast
+    private var placementResult: PlacementRecommendation?
+
     @Published var exercise = "Unknown"
     @Published var running = false
     @Published var confidence: Double = 0
@@ -28,6 +45,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     private let queue = DispatchQueue(label: "move.camera")
     private var configured = false
     private var active = false
+    private var wantsStart = false
     private var busy = false
     private var lastFrame = Date.distantPast
     private let context = CIContext()
@@ -45,13 +63,19 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
         }
         let url = base.appendingPathComponent("predict")
 
+        queue.async { self.wantsStart = true }
         AVCaptureDevice.requestAccess(for: .video) { [weak self] allowed in
             guard let self else { return }
             guard allowed else { self.publish { self.message = "Allow camera access in Settings to continue." }; return }
             self.queue.async {
-                guard !self.active else { return }
+                guard self.wantsStart, !self.active else { return }
+                guard (80...250).contains(self.heightCM) else {
+                    self.publish { self.message = "Enter a person’s height between 80 and 250 cm in Placement options." }
+                    return
+                }
                 do {
                     try self.configure()
+                    self.resetPlacement()
                     self.history.reset()
                     self.movementSessionID = UUID().uuidString
                     self.endpoint = url
@@ -68,7 +92,9 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     func stop() {
         queue.async {
             self.cancelCapture()
+            self.resetPlacement()
             self.active = false
+            self.wantsStart = false
             self.generation += 1
             self.busy = false
             self.task?.cancel()
@@ -84,6 +110,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
         queue.async {
             guard self.active else { return }
             self.cancelCapture()
+            self.resetPlacement()
             self.generation += 1
             self.task?.cancel()
             self.busy = false
@@ -176,8 +203,10 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
         output.alwaysDiscardsLateVideoFrames = true
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         output.setSampleBufferDelegate(self, queue: queue)
-        guard session.canAddOutput(output) else { session.removeInput(input); throw NSError(domain: "MoveCamera", code: 3, userInfo: [NSLocalizedDescriptionKey: "Could not read camera frames."]) }
+        guard session.canAddOutput(output), session.canAddOutput(photoOutput) else { session.removeInput(input); throw NSError(domain: "MoveCamera", code: 3, userInfo: [NSLocalizedDescriptionKey: "Could not read camera frames."]) }
         session.addOutput(output)
+        session.addOutput(photoOutput)
+        if let connection = photoOutput.connection(with: .video), connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
         if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
         configured = true
     }
@@ -195,6 +224,10 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             lastCaptureTime = elapsed
             captureFrames.append(CapturedFrame(timestamp: elapsed*1000, jpeg: jpeg))
             publish { self.captureMessage = String(format: "Capturing movement · %.1f / 6 seconds", elapsed) }
+            return
+        }
+        if active, history.isLocked {
+            updateHeading(sampleBuffer)
             return
         }
         guard active, !history.isLocked, !busy, Date().timeIntervalSince(lastFrame) >= 0.5,
@@ -222,6 +255,10 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
                     return
                 }
                 let display = self.history.apply(result)
+                if self.history.isLocked, self.placementExercise == nil {
+                    self.placementExercise = PlacementExercise.allCases.first { $0.title == display }
+                    self.publish { self.step = .position; self.message = "Exercise recognised. Hold the phone steady to find your camera position." }
+                }
                 let confidence = self.history.confidence
                 let locked = self.history.isLocked
                 let cloud = self.history.cloudConfirmed
@@ -232,7 +269,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
                 self.publish {
                     self.exercise = locked ? display : preview; self.liveScore = score; self.evidenceSource = evidence; self.lockCandidate = display; self.confidence = confidence; self.labelLocked = locked; self.cloudConfirmed = cloud; self.agreeingReadings = agreeing
                     if locked {
-                        self.message = cloud ? "Two AI checks agree. Label fixed until Re-classify." : "Label fixed for this session. Tap Re-classify to check again."
+                        self.message = "Exercise recognised. Hold steady at the setup mark to find your camera position."
                     } else {
                         switch result.cloud_status {
                         case "checking": self.message = "Still uncertain locally. AI is checking a short movement sequence…"
@@ -247,6 +284,120 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             }
         }
         task?.resume()
+    }
+
+    func configurePlacement(heightCM: Double, setupMarker: FloorMarker, facingOverride: FloorMarker?) {
+        queue.async {
+            guard !self.photoPending else { return }
+            self.heightCM = heightCM
+            self.setupMarker = setupMarker
+            self.facingOverride = facingOverride
+            self.headings.reset()
+            self.placementResult = nil
+            self.placementLocked = false
+            self.lastGoodHeading = .distantPast
+            self.publish {
+                self.recommendation = nil
+                if self.labelLocked { self.step = .position }
+            }
+            self.applyFacingOverride()
+        }
+    }
+
+    func lockPlacement() {
+        queue.async {
+            guard self.active, self.placementResult != nil,
+                  self.facingOverride != nil || Date().timeIntervalSince(self.lastGoodHeading) < 2 else { return }
+            self.placementLocked = true
+            self.publish { self.step = .capture; self.message = "Move to the highlighted mark. Keep the whole body in view, then capture an image." }
+        }
+    }
+
+    func captureImage() {
+        queue.async {
+            guard self.active, self.placementLocked, !self.photoPending else { return }
+            self.photoPending = true
+            self.publish { self.step = .processing; self.message = "Capturing image…"; self.reviewInput = nil }
+            self.photoOutput.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
+        }
+    }
+
+    private func resetPlacement() {
+        placementExercise = nil; placementResult = nil; placementLocked = false
+        photoPending = false; headings.reset(); lastHeadingTime = .distantPast; lastGoodHeading = .distantPast
+        publish { self.step = .recognise; self.recommendation = nil; self.reviewInput = nil }
+    }
+
+    private func applyFacingOverride() {
+        guard active, let exercise = placementExercise, let facingOverride,
+              let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
+                headingDegrees: facingOverride.angleDegrees, setupMarker: setupMarker) else { return }
+        placementResult = result
+        publish { self.recommendation = result; self.message = "Using corrected facing. Confirm this position before moving the phone." }
+    }
+
+    private func updateHeading(_ sampleBuffer: CMSampleBuffer) {
+        guard !placementLocked, let exercise = placementExercise else { return }
+        if facingOverride != nil { applyFacingOverride(); return }
+        let now = Date()
+        guard now.timeIntervalSince(lastHeadingTime) >= 0.45,
+              let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        lastHeadingTime = now
+        guard let heading = placementPose.estimate(buffer, exercise: exercise, setupMarker: setupMarker) else {
+            if now.timeIntervalSince(lastGoodHeading) > 2 {
+                headings.reset(); placementResult = nil
+                publish { self.recommendation = nil; self.message = "Keep one full body visible. If facing is unclear, correct it in Placement options." }
+            }
+            return
+        }
+        lastGoodHeading = now
+        guard let stable = headings.add(heading),
+              let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
+                headingDegrees: stable, setupMarker: setupMarker) else { return }
+        placementResult = result
+        publish { self.recommendation = result; self.message = "Position ready. Confirm it, then move the phone." }
+    }
+
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        // Bound the upload in memory; never write the photo to the camera roll.
+        let source = error == nil ? photo.fileDataRepresentation().flatMap(UIImage.init(data:)) : nil
+        var jpeg: Data?
+        if let source {
+            let scale = min(1, 1280 / max(source.size.width, source.size.height))
+            let format = UIGraphicsImageRendererFormat(); format.scale = 1
+            jpeg = UIGraphicsImageRenderer(size: CGSize(width: source.size.width * scale, height: source.size.height * scale), format: format).jpegData(withCompressionQuality: 0.8) { _ in
+                source.draw(in: CGRect(origin: .zero, size: CGSize(width: source.size.width * scale, height: source.size.height * scale)))
+            }
+        }
+        let capturedJPEG = jpeg
+        queue.async {
+            guard self.active, self.photoPending else { return }
+            guard let capturedJPEG, let exercise = self.placementExercise,
+                  let placement = self.placementResult, let endpoint = self.endpoint,
+                  let network = self.network else {
+                self.photoPending = false
+                self.publish { self.step = .capture; self.message = "Could not capture the image. Try again." }
+                return
+            }
+            self.publish { self.message = "Extracting image features…"; self.reviewImages = [capturedJPEG] }
+            let token = self.generation
+            let request = ImageFeatureRequest.make(endpoint: endpoint.deletingLastPathComponent().appendingPathComponent("capture/image"), exercise: exercise.rawValue, jpeg: capturedJPEG)
+            self.task = network.dataTask(with: request) { [weak self] data, response, error in
+                guard let self else { return }
+                self.queue.async {
+                    guard self.active, token == self.generation else { return }
+                    self.photoPending = false
+                    guard error == nil, let data, let http = response as? HTTPURLResponse, http.statusCode == 200,
+                          let features = try? JSONDecoder().decode(MovementCaptureResult.self, from: data),
+                          let input = FeedbackRequest.capturedImage(features: features, placement: placement) else {
+                        self.publish { self.step = .capture; self.reviewImages = []; self.message = "Feature extraction failed. Check the connection, keep your body in view, and capture again." }
+                        return
+                    }
+                    self.publish { self.step = .review; self.captureResult = features; self.reviewInput = input; self.message = "Image features ready. Preparing voice feedback…" }
+                }
+            }
+            self.task?.resume()
+        }
     }
 
     private func publish(_ action: @escaping @Sendable () -> Void) { DispatchQueue.main.async(execute: action) }
