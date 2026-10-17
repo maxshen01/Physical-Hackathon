@@ -72,3 +72,40 @@ def test_invalid_angles_and_arm_difference():
         request("pushup", {"hip_offset_left_torso_lengths": float("inf")})
     with pytest.raises(ValidationError):
         request("squat", {"arm_left_deg": 90})
+
+
+def capture(exercise, values, angle=None):
+    angle = (0 if exercise == "lateral_raise" else 90) if angle is None else angle
+    return FeedbackRequest.model_validate({
+        "exercise": exercise, "camera_angle_deg": angle,
+        "snapshots": [{"phase": "capture", **values}],
+    })
+
+
+def capture_ids(value):
+    return [cue.id for cue in evaluate(value).candidates]
+
+
+def test_capture_always_offers_feedback_even_without_measurements():
+    for exercise in ("squat", "pushup", "lateral_raise"):
+        result = evaluate(capture(exercise, {}))
+        assert result.assessable and [cue.id for cue in result.candidates][-1].endswith("_general")
+        wrong_view = evaluate(capture(exercise, {}, angle=45 if exercise == "lateral_raise" else 0))
+        assert wrong_view.assessable and len(wrong_view.candidates) == 1
+
+
+def test_capture_orders_corrections_before_positives_and_general_tip():
+    ids = capture_ids(capture("squat", {"knee_left_deg": 140, "torso_inclination_deg": 20}))
+    assert ids == ["capture_squat_depth", "capture_squat_torso_good", "squat_general"]
+    assert capture_ids(capture("squat", {"knee_left_deg": 90}))[0] == "capture_squat_depth_good"
+    assert capture_ids(capture("squat", {"torso_inclination_deg": 175})) == ["squat_general"]
+    assert capture_ids(capture("pushup", {"elbow_right_deg": 106, "body_alignment_right_deg": 172, "hip_offset_right_torso_lengths": -0.1})) == [
+        "capture_pushup_depth", "capture_pushup_line_good", "pushup_general"]
+    assert capture_ids(capture("lateral_raise", {"arm_left_deg": 94, "arm_right_deg": 92, "arm_difference_deg": 2})) == [
+        "capture_raise_height_good", "capture_even_arms", "raise_general"]
+    assert capture_ids(capture("lateral_raise", {"arm_left_deg": 95, "arm_right_deg": 78, "arm_difference_deg": 17}))[0] == "capture_uneven_arms"
+
+
+def test_capture_depth_cues_stay_conditional():
+    cues = {cue.id: cue.cue for cue in evaluate(capture("squat", {"knee_left_deg": 140})).candidates}
+    assert cues["capture_squat_depth"].startswith("If this is the lowest point")

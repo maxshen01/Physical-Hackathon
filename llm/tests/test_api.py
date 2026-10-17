@@ -112,3 +112,22 @@ def test_missing_provider_settings(monkeypatch):
     assert response.status_code == 200
     assert response.json()["audio_base64"] is None
     assert "ELEVENLABS_VOICE_ID" in response.json()["audio_error"]
+
+
+def test_capture_falls_back_to_top_cue_when_model_selects_none(monkeypatch, caplog):
+    configure(monkeypatch)
+    monkeypatch.setattr(main, "choose_cues", lambda *_args: [])
+    monkeypatch.setattr(main, "synthesize_speech", lambda *_args: b"audio")
+    with caplog.at_level("INFO", logger="uvicorn.error"):
+        response = client.post("/api/feedback", json={
+            "exercise": "squat", "camera_angle_deg": 90,
+            "snapshots": [{"phase": "capture", "knee_left_deg": 140}],
+        })
+    feedback = response.json()["feedback"]
+    assert response.status_code == 200 and feedback["status"] == "assessable"
+    assert feedback["cues"] == ["If this is the lowest point of your squat, try sitting a little deeper."]
+    assert feedback["spoken_text"].startswith("Here's your feedback. If this is the lowest point")
+    assert "Feedback request: exercise=squat" in caplog.text and "knee_left_deg" in caplog.text
+    assert "eligible_cue_ids=['capture_squat_depth', 'squat_general']" in caplog.text
+    assert "using top-priority cue_id=capture_squat_depth" in caplog.text
+    assert "test-openai-key" not in caplog.text

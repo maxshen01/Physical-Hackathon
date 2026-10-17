@@ -2,7 +2,7 @@
 
 ## Current integrated demo flow
 
-The user revised the demo workflow on 2026-10-17: start the camera, classify the exercise, recommend the best available floor-mark angle, move the phone, capture one image, extract features, run the LLM, then speak feedback. Voice is the primary output, with a transcript available if speech fails. Treat this single-image flow as the current integration scope; the completed-video workflow below remains a future product requirement. Never fabricate start/peak/finish measurements from one image or claim that a still image verifies a repetition. Keep the safety, validation, server-side credentials and cleanup rules below.
+The user revised the demo workflow on 2026-10-17: start the camera, classify the exercise, recommend the best available floor-mark angle, move the phone, capture one image, extract features, run the LLM, then speak feedback. Voice is the primary output, with a transcript available if speech fails. Treat this single-image flow as the current integration scope; the completed-video workflow below remains a future product requirement. Never fabricate start/peak/finish measurements from one image or claim that a still image verifies a repetition. Every capture must still produce spoken feedback from whatever measurements are available (decided 2026-10-17): depth and range cues from one photo are worded conditionally ("If this is the lowest point…"), positive confirmations are allowed, and a general form tip is the fallback when nothing can be measured. Keep the safety, validation, server-side credentials and cleanup rules below.
 
 ## Purpose and first version
 

@@ -32,7 +32,16 @@ def health() -> dict[str, str]:
 
 @app.post("/api/feedback", response_model=FeedbackResponse)
 async def feedback(request: FeedbackRequest) -> FeedbackResponse:
+    logger.info(
+        "Feedback request: exercise=%s camera_angle_deg=%s snapshots=%s",
+        request.exercise, request.camera_angle_deg,
+        [snapshot.model_dump(exclude_none=True) for snapshot in request.snapshots],
+    )
     evaluation = evaluate(request)
+    logger.info(
+        "Feedback rules: assessable=%s reason=%r eligible_cue_ids=%s",
+        evaluation.assessable, evaluation.reason, [item.id for item in evaluation.candidates],
+    )
     if not evaluation.assessable:
         result = approved_feedback(Feedback(
             status="unable_to_assess", observations=[evaluation.reason], cues=[], spoken_text="placeholder"
@@ -51,7 +60,12 @@ async def feedback(request: FeedbackRequest) -> FeedbackResponse:
                     settings.openai_api_key, settings.openai_model,
                 )
             except AnalysisError as exc:
+                logger.warning("Feedback analysis failed: %s", exc)
                 raise HTTPException(502, str(exc)) from exc
+            if not selected and len(request.snapshots) == 1 and evaluation.candidates:
+                # Single captures always get feedback; candidates are priority-ordered.
+                selected = [evaluation.candidates[0].id]
+                logger.info("Model selected no cue for a capture; using top-priority cue_id=%s", selected[0])
         else:
             logger.info("No eligible correction cues from peak measurements: exercise=%s", request.exercise)
         result = approved_feedback(Feedback(
@@ -61,6 +75,10 @@ async def feedback(request: FeedbackRequest) -> FeedbackResponse:
             spoken_text="placeholder",
         ))
 
+    logger.info(
+        "Feedback result: status=%s cues=%s spoken_text=%r",
+        result.status, result.cues, result.spoken_text,
+    )
     settings = Settings.from_env()
     missing_speech = settings.missing_speech()
     if missing_speech:

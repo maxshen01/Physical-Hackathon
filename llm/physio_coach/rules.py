@@ -43,16 +43,10 @@ def _has_usable_peak(exercise: str, peak: Snapshot) -> bool:
 
 def evaluate(request: FeedbackRequest) -> Evaluation:
     """Only peak values trigger cues; start/finish remain LLM context."""
-    angle = abs(request.camera_angle_deg)
-    suitable_view = (
-        abs(angle - 90) <= 30 if request.exercise in {"squat", "pushup"}
-        else angle <= 30
-    )
-    if not suitable_view:
-        return Evaluation(False, "The camera angle does not support reliable cues for this exercise.")
-
     if len(request.snapshots) == 1:
         return evaluate_capture(request)
+    if not _suitable_view(request):
+        return Evaluation(False, "The camera angle does not support reliable cues for this exercise.")
 
     peak = request.snapshots[1]
     if not _has_usable_peak(request.exercise, peak):
@@ -95,22 +89,97 @@ def evaluate(request: FeedbackRequest) -> Evaluation:
     return Evaluation(True, "Peak-stage measurements were available for review.", tuple(candidates))
 
 
-def evaluate_capture(request: FeedbackRequest) -> Evaluation:
-    """A single image cannot identify a movement peak or prescribed variation.
+GENERAL_TIPS = {
+    "squat": Candidate(
+        "squat_general", "Keep your weight through your heels and your knees in line with your toes.",
+        "General squat form tip.",
+    ),
+    "pushup": Candidate(
+        "pushup_general", "Keep your body in one straight line from head to heels.",
+        "General push-up form tip.",
+    ),
+    "lateral_raise": Candidate(
+        "raise_general", "Lift with a slight bend in your elbows and lower slowly.",
+        "General lateral-raise form tip.",
+    ),
+}
 
-    Offer only a view-specific symmetry cue, never depth/range targets. Keep
-    measured angles in the research payload, out of patient-facing claims.
+
+def _suitable_view(request: FeedbackRequest) -> bool:
+    angle = abs(request.camera_angle_deg)
+    return abs(angle - 90) <= 30 if request.exercise in {"squat", "pushup"} else angle <= 30
+
+
+def evaluate_capture(request: FeedbackRequest) -> Evaluation:
+    """Always offer feedback for one image, using whatever measurements exist.
+
+    One photo cannot show the movement peak, so depth and range cues are
+    conditional ("if this is the lowest point..."). Corrections come first,
+    then positive confirmations, then a general tip that is always eligible.
     """
     capture = request.snapshots[0]
+    general = GENERAL_TIPS[request.exercise]
+    if not _suitable_view(request):
+        return Evaluation(True, "The camera angle limits what this photo can measure, so this is a general tip.", (general,))
     if not _has_usable_peak(request.exercise, capture):
-        return Evaluation(False, "The image does not show enough clear body landmarks. Keep your whole body in view and capture again.")
-    candidates = ()
-    if request.exercise == "lateral_raise" and all(
-        value is not None for value in (capture.arm_left_deg, capture.arm_right_deg, capture.arm_difference_deg)
-    ) and capture.arm_difference_deg > 10:
-        candidates = (Candidate(
-            "capture_uneven_arms",
-            "If your prescribed exercise uses both arms together, try lifting them evenly",
-            "The visible arms are at different heights in this image.",
-        ),)
-    return Evaluation(True, "This image shows one position only. It does not establish exercise depth or a complete repetition.", candidates)
+        return Evaluation(True, "The photo did not show enough clear body points to measure, so this is a general tip.", (general,))
+
+    corrections: list[Candidate] = []
+    positives: list[Candidate] = []
+    if request.exercise == "squat":
+        knees = _available(capture.knee_left_deg, capture.knee_right_deg)
+        if knees:
+            knee = min(knees)
+            if knee > 100:
+                corrections.append(Candidate("capture_squat_depth", "If this is the lowest point of your squat, try sitting a little deeper.", f"In this photo the most-bent knee is about {knee:.0f}° (target at the bottom: 100° or less)."))
+            else:
+                positives.append(Candidate("capture_squat_depth_good", "Good depth here, your knees are well bent.", f"In this photo the most-bent knee is about {knee:.0f}°, within the 100° depth target."))
+        torso = capture.torso_inclination_deg
+        if torso is not None and torso <= 90:
+            if torso > 45:
+                corrections.append(Candidate("capture_squat_torso", "Try keeping your chest a little more upright.", f"In this photo the torso leans about {torso:.0f}° from vertical (target: 45° or less)."))
+            else:
+                positives.append(Candidate("capture_squat_torso_good", "Nice upright chest.", f"In this photo the torso leans about {torso:.0f}° from vertical, within the 45° target."))
+    elif request.exercise == "pushup":
+        elbows = _available(capture.elbow_left_deg, capture.elbow_right_deg)
+        if elbows:
+            elbow = min(elbows)
+            if elbow > 90:
+                corrections.append(Candidate("capture_pushup_depth", "If this is your lowest point, try lowering your chest a little further.", f"In this photo the most-bent elbow is about {elbow:.0f}° (target at the bottom: 90° or less)."))
+            else:
+                positives.append(Candidate("capture_pushup_depth_good", "Good depth, your elbows are well bent.", f"In this photo the most-bent elbow is about {elbow:.0f}°, within the 90° depth target."))
+        paired = [
+            (alignment, offset)
+            for alignment, offset in (
+                (capture.body_alignment_left_deg, capture.hip_offset_left_torso_lengths),
+                (capture.body_alignment_right_deg, capture.hip_offset_right_torso_lengths),
+            )
+            if alignment is not None and offset is not None
+        ]
+        alignments = _available(capture.body_alignment_left_deg, capture.body_alignment_right_deg)
+        if paired and all(alignment < 165 and offset < -0.1 for alignment, offset in paired):
+            corrections.append(Candidate("capture_pushup_hips_low", "Lift your hips a little to keep your body straight.", "In this photo the hips sit below the shoulder-to-ankle line."))
+        elif paired and all(alignment < 165 and offset > 0.1 for alignment, offset in paired):
+            corrections.append(Candidate("capture_pushup_hips_high", "Lower your hips a little to keep your body straight.", "In this photo the hips sit above the shoulder-to-ankle line."))
+        elif alignments and all(value >= 165 for value in alignments):
+            positives.append(Candidate("capture_pushup_line_good", "Your body is in a nice straight line.", f"In this photo body alignment is about {min(alignments):.0f}° (target: 165° to 180°)."))
+    else:
+        arms = _available(capture.arm_left_deg, capture.arm_right_deg)
+        if arms:
+            if all(value < 80 for value in arms):
+                corrections.append(Candidate("capture_raise_low", "If this is the top of the lift, raise your arms up to shoulder height.", f"In this photo the arms are at about {max(arms):.0f}° (target at the top: 80° to 100°)."))
+            elif all(value > 100 for value in arms):
+                corrections.append(Candidate("capture_raise_high", "Stop at shoulder height rather than lifting higher.", f"In this photo the arms are at about {min(arms):.0f}° (target at the top: 80° to 100°)."))
+            elif all(80 <= value <= 100 for value in arms):
+                positives.append(Candidate("capture_raise_height_good", "Good height, your arms are at about shoulder level.", "In this photo the arms are within the 80° to 100° shoulder-height range."))
+        difference = capture.arm_difference_deg
+        if difference is not None:
+            if difference > 10:
+                corrections.append(Candidate("capture_uneven_arms", "Try lifting both arms evenly.", f"In this photo the arms differ by about {difference:.0f}° (target: 10° or less)."))
+            else:
+                positives.append(Candidate("capture_even_arms", "Nice and even on both sides.", f"In this photo the arms are within {difference:.0f}° of each other."))
+    return Evaluation(
+        True,
+        "This photo shows one moment, so depth and range cues assume it is the key position of the movement.",
+        tuple(corrections + positives + [general]),
+    )

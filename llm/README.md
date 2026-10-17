@@ -133,7 +133,7 @@ The integrated app now uses **one captured image**, following the revised produc
 }
 ```
 
-A single capture is never labelled a movement peak. It cannot trigger squat/push-up depth targets or claims about a full repetition. Available, suitable-view captures go through the LLM even when there are no eligible corrections; the only currently eligible single-image cue is conditional bilateral arm symmetry for a front-view lateral raise. It explicitly defers to the prescribed variation. Missing features or unsuitable views produce an approved spoken request to try again without an LLM call. Numeric features remain image-plane research values and are not presented as clinical joint angles.
+A single capture is never labelled a movement peak or a full repetition, but it always gets spoken feedback. The rules build priority-ordered candidates from whatever measurements are present: corrections first (depth and range targets worded conditionally, e.g. "If this is the lowest point of your squat…"), then positive confirmations, then a general form tip for the exercise. An unsuitable camera view or missing landmarks leaves only the general tip. The LLM is asked to pick one or two; if it picks none, the server uses the top-priority candidate. Numeric features remain image-plane research values and are not presented as clinical joint angles.
 
 For the simplest setup, use the combined `demo:app` server described in the root README. Both `/capture/image` and `/api/feedback` share the same HTTPS origin; a separate hosted service is optional. Voice feedback plays automatically in the app and can be replayed or stopped. Audio errors preserve the validated transcript. Local image and audio history is not stored.
 
@@ -141,4 +141,4 @@ The LLM client bounds its request to 45 seconds without automatic retries; Eleve
 
 ## Logging
 
-At the default Uvicorn `info` log level, the server logs when the rules find no eligible cue. When OpenAI is called, it logs the response ID, status, incomplete reason, returned `output_text`, and validated cue IDs. Provider request failures log the error type and request ID. These logs do not include API keys or the measurement request, but model output is logged, so restrict access to server logs.
+At the default Uvicorn `info` log level, the server logs each feedback request's measurements, the rules decision with eligible cue IDs, and the final cues and spoken text; `/capture/image` logs each extracted feature's value, landmark quality and whether the app keeps it (quality ≥ 0.6). It also logs when the rules find no eligible cue. When OpenAI is called, it logs the response ID, status, incomplete reason, returned `output_text`, and validated cue IDs. Provider request failures log the error type and request ID. These logs do not include API keys or images, but measurements and model output are logged, so restrict access to server logs.

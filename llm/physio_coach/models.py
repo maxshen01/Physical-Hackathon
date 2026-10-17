@@ -109,7 +109,7 @@ def approved_feedback(feedback: Feedback) -> Feedback:
     elif not feedback.cues:
         speech = "These measurements do not support a specific correction. Please follow your physiotherapist's plan."
     else:
-        speech = "Based on these measurements, try this. " + feedback.cues[0].rstrip(" .") + "."
+        speech = "Here's your feedback. " + feedback.cues[0].rstrip(" .") + "."
         if len(feedback.cues) == 2:
             second = feedback.cues[1].rstrip(" .")
             speech += " Also, " + second[:1].lower() + second[1:] + "."

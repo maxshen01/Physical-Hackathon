@@ -1,5 +1,6 @@
 """Frame-upload API. Phone/simulation use the same POST /predict contract."""
 import io
+import logging
 import json
 import math
 import threading
@@ -16,6 +17,9 @@ from .schemas import PredictionResponse, HealthResponse
 from .hybrid import HybridClassifier
 from .preview import prediction_preview, ALLOWED_EXERCISES
 from .vision_fallback import VisionFallback, settings as vision_settings
+
+log = logging.getLogger('uvicorn.error')
+
 
 def create_app(classifier_factory=HybridClassifier, vision_factory=VisionFallback):
     lock = threading.Lock()
@@ -146,7 +150,18 @@ def create_app(classifier_factory=HybridClassifier, vision_factory=VisionFallbac
                 except Exception:
                     raise HTTPException(503, 'Feature extraction failed. Please capture again.') from None
             frame = extract_pose_features(poses, image.width, image.height, 0, exercise)
-            return summarize(exercise, [frame])
+            result = summarize(exercise, [frame])
+            features = result['frames'][0]['features'] if result.get('frames') else {}
+            # The app keeps a value only if landmark_quality >= 0.6 and no unavailable_reason.
+            log.info('Capture features: exercise=%s status=%s poses=%d size=%dx%d features=%s', exercise,
+                     result.get('status'), len(poses), image.width, image.height,
+                     {k: {'value': None if m.get('value') is None else round(m['value'], 1),
+                          'quality': None if m.get('landmark_quality') is None else round(m['landmark_quality'], 2),
+                          'reason': m.get('unavailable_reason'),
+                          'app_keeps': m.get('unavailable_reason') is None and m.get('value') is not None
+                                       and (m.get('landmark_quality') or 0) >= .6}
+                      for k, m in features.items()})
+            return result
         finally:
             for image in images:
                 image.close()
