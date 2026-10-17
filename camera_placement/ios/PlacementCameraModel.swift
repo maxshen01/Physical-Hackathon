@@ -18,14 +18,12 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
     private var wantsStart = false
     private var isLocked = false
     private var lastPoseFrame = Date.distantPast
-    private var lastGoodPose = Date.distantPast
-    private var lastDirectionSample = Date.distantPast
     private var capturing = false
     private var exercise: PlacementExercise = .squat
     private var heightCM: Double = 170
     private var setupMarker: FloorMarker = .bottom
     private var facingOverride: FloorMarker?
-    private var headings = HeadingWindow()
+    private var headings = HeadingTracker()
     private var currentRecommendation: PlacementRecommendation?
 
     func start(exercise: PlacementExercise, heightCM: Double, setupMarker: FloorMarker, facingOverride: FloorMarker?) {
@@ -53,8 +51,6 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
                     self.currentRecommendation = nil
                     self.isLocked = false
                     self.lastPoseFrame = .distantPast
-                    self.lastGoodPose = .distantPast
-                    self.lastDirectionSample = .distantPast
                     self.capturing = false
                     self.active = true
                     self.session.startRunning()
@@ -84,8 +80,6 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
             self.headings.reset()
             self.currentRecommendation = nil
             self.isLocked = false
-            self.lastGoodPose = .distantPast
-            self.lastDirectionSample = .distantPast
             self.publish {
                 self.locked = false
                 self.recommendation = nil
@@ -101,7 +95,7 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
     func lockPlacement() {
         queue.async {
             guard self.active, self.currentRecommendation != nil,
-                  (self.facingOverride != nil || Date().timeIntervalSince(self.lastGoodPose) < 2) else { return }
+                  (self.facingOverride != nil || self.headings.current(at: ProcessInfo.processInfo.systemUptime) != nil) else { return }
             self.isLocked = true
             self.publish {
                 self.locked = true
@@ -117,8 +111,6 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
             self.facingOverride = nil
             self.currentRecommendation = nil
             self.headings.reset()
-            self.lastGoodPose = .distantPast
-            self.lastDirectionSample = .distantPast
             self.publish {
                 self.locked = false
                 self.recommendation = nil
@@ -198,11 +190,14 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
               now.timeIntervalSince(lastPoseFrame) >= 0.45,
               let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         lastPoseFrame = now
-        guard let heading = pose.estimate(buffer, exercise: exercise, setupMarker: setupMarker) else {
-            if now.timeIntervalSince(lastDirectionSample) > 1.3 { headings.reset() }
-            if now.timeIntervalSince(lastGoodPose) > 2, currentRecommendation != nil {
+        let estimate = pose.estimate(buffer, exercise: exercise, setupMarker: setupMarker)
+        guard let stableHeading = headings.add(estimate?.degrees, at: ProcessInfo.processInfo.systemUptime),
+              let result = PlacementEngine.recommend(
+                exercise: exercise, subjectHeightCM: heightCM,
+                headingDegrees: stableHeading, setupMarker: setupMarker
+              ) else {
+            if currentRecommendation != nil {
                 currentRecommendation = nil
-                headings.reset()
                 publish {
                     self.recommendation = nil
                     self.message = "Direction is unclear. Keep one full body in view and hold the phone steady."
@@ -210,14 +205,6 @@ final class PlacementCameraModel: NSObject, ObservableObject, AVCaptureVideoData
             }
             return
         }
-        if now.timeIntervalSince(lastDirectionSample) > 1.3 { headings.reset() }
-        lastDirectionSample = now
-        guard let stableHeading = headings.add(heading),
-              let result = PlacementEngine.recommend(
-                exercise: exercise, subjectHeightCM: heightCM,
-                headingDegrees: stableHeading, setupMarker: setupMarker
-              ) else { return }
-        lastGoodPose = now
         if result.marker != currentRecommendation?.marker
             || result.cameraHeightCM != currentRecommendation?.cameraHeightCM
             || result.approximateCameraAngleDegrees != currentRecommendation?.approximateCameraAngleDegrees {

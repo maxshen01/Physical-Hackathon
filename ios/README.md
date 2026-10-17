@@ -13,3 +13,12 @@ The gear menu accepts one HTTPS demo address. Leave the optional separate feedba
 See the root [README](../README.md) for server setup, public certificate copy, build and test commands. Camera permission and local-network permission are required; no microphone or Photos-library permission is requested. **Placement options** contains height, setup mark and manual facing correction. Controls are disabled while a photo is being processed, while Stop remains available to cancel.
 
 Test recognition, Apple Vision orientation for all eight headings, actual movement to the selected mark, capture and audible playback on a physical iPhone. Simulator build and mocked API tests cannot verify these physical steps.
+
+Orientation uses Apple Vision 2D and 3D pose detection, plus local torso/profile
+geometry, rather than an LLM. The placement card shows the evidence source.
+To retest a sideways squat, start at mark 5, leave **Person faces** on
+**Automatic**, and face mark 7 or 3 with the torso and face in profile. A clear
+profile should recommend mark 5; the evidence label should say **Apple Vision
+2D torso + face profile**. Turn the entire body, not only the head. Hold each
+direction for several samples. If the direction remains unclear, the marker
+should disappear after two seconds. These heuristics still need device testing.

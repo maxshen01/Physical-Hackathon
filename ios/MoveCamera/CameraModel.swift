@@ -8,6 +8,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     let session = AVCaptureSession()
     @Published private(set) var step: Step = .recognise
     @Published private(set) var recommendation: PlacementRecommendation?
+    @Published private(set) var orientationSource = ""
     @Published var reviewInput: FeedbackRequest?
     private let photoOutput = AVCapturePhotoOutput()
     private let placementPose = OnDevicePoseHeading()
@@ -15,11 +16,10 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     private var heightCM: Double = 170
     private var setupMarker: FloorMarker = .bottom
     private var facingOverride: FloorMarker?
-    private var headings = HeadingWindow()
+    private var headings = HeadingTracker()
     private var placementLocked = false
     private var photoPending = false
     private var lastHeadingTime = Date.distantPast
-    private var lastGoodHeading = Date.distantPast
     private var placementResult: PlacementRecommendation?
 
     @Published var exercise = "Unknown"
@@ -295,9 +295,9 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             self.headings.reset()
             self.placementResult = nil
             self.placementLocked = false
-            self.lastGoodHeading = .distantPast
             self.publish {
                 self.recommendation = nil
+                self.orientationSource = ""
                 if self.labelLocked { self.step = .position }
             }
             self.applyFacingOverride()
@@ -307,7 +307,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     func lockPlacement() {
         queue.async {
             guard self.active, self.placementResult != nil,
-                  self.facingOverride != nil || Date().timeIntervalSince(self.lastGoodHeading) < 2 else { return }
+                  self.facingOverride != nil || self.headings.current(at: ProcessInfo.processInfo.systemUptime) != nil else { return }
             self.placementLocked = true
             self.publish { self.step = .capture; self.message = "Move to the highlighted mark. Keep the whole body in view, then capture an image." }
         }
@@ -324,8 +324,8 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
 
     private func resetPlacement() {
         placementExercise = nil; placementResult = nil; placementLocked = false
-        photoPending = false; headings.reset(); lastHeadingTime = .distantPast; lastGoodHeading = .distantPast
-        publish { self.step = .recognise; self.recommendation = nil; self.reviewInput = nil }
+        photoPending = false; headings.reset(); lastHeadingTime = .distantPast
+        publish { self.step = .recognise; self.recommendation = nil; self.reviewInput = nil; self.orientationSource = "" }
     }
 
     private func applyFacingOverride() {
@@ -333,7 +333,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
               let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
                 headingDegrees: facingOverride.angleDegrees, setupMarker: setupMarker) else { return }
         placementResult = result
-        publish { self.recommendation = result; self.message = "Using corrected facing. Confirm this position before moving the phone." }
+        publish { self.recommendation = result; self.orientationSource = "Manual facing correction"; self.message = "Using corrected facing. Confirm this position before moving the phone." }
     }
 
     private func updateHeading(_ sampleBuffer: CMSampleBuffer) {
@@ -343,19 +343,21 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
         guard now.timeIntervalSince(lastHeadingTime) >= 0.45,
               let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         lastHeadingTime = now
-        guard let heading = placementPose.estimate(buffer, exercise: exercise, setupMarker: setupMarker) else {
-            if now.timeIntervalSince(lastGoodHeading) > 2 {
-                headings.reset(); placementResult = nil
-                publish { self.recommendation = nil; self.message = "Keep one full body visible. If facing is unclear, correct it in Placement options." }
-            }
+        let estimate = placementPose.estimate(buffer, exercise: exercise, setupMarker: setupMarker)
+        guard let stable = headings.add(estimate?.degrees, at: ProcessInfo.processInfo.systemUptime),
+              let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
+                headingDegrees: stable, setupMarker: setupMarker) else {
+            placementResult = nil
+            publish { self.recommendation = nil; self.orientationSource = ""; self.message = "Facing is not stable. Hold still with your full body visible, or correct Person faces in Placement options." }
             return
         }
-        lastGoodHeading = now
-        guard let stable = headings.add(heading),
-              let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
-                headingDegrees: stable, setupMarker: setupMarker) else { return }
         placementResult = result
-        publish { self.recommendation = result; self.message = "Position ready. Confirm it, then move the phone." }
+        let source = estimate.flatMap { abs(($0.degrees - stable + 540).truncatingRemainder(dividingBy: 360) - 180) <= 25 ? $0.source : nil }
+        publish {
+            self.recommendation = result
+            if let source { self.orientationSource = source }
+            self.message = "Position ready. Confirm it, then move the phone."
+        }
     }
 
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {

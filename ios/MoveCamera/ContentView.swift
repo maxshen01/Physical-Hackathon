@@ -92,6 +92,7 @@ struct ContentView: View {
                             }
                             Text("Approx. camera angle: \(result.approximateCameraAngleDegrees)° clockwise from facing")
                                 .font(.footnote).foregroundStyle(.secondary)
+                            Text(camera.orientationSource).font(.caption).foregroundStyle(.secondary)
                             FloorMap(selected: result.marker, setup: setupMarker).frame(height: 160)
                         }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
                     } else {

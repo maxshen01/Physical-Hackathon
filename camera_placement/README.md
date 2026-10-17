@@ -1,7 +1,7 @@
 # On-device camera placement
 
-The iPhone app uses the rear camera and Apple's Vision 3D body pose request to
-estimate a person's direction every 0.45 seconds. Heading inference runs on the phone. The integrated app first recognises the
+The iPhone app uses the rear camera and Apple's Vision 2D and 3D body pose
+requests to estimate a person's direction every 0.45 seconds. Heading inference runs on the phone. The integrated app first recognises the
 exercise through the demo server, then uses this placement engine. After moving,
 the captured image goes to the server for features and voice feedback. Images
 stay in memory and are discarded after review; provider keys remain server-side.
@@ -31,6 +31,30 @@ The recommendation shows the direction inferred from the setup image. If that
 direction is wrong, choose the correct floor mark in **Person faces** under **Placement options**. The recommendation is recalculated on the phone using
 the same fixed preset. Select **Automatic** to try live detection again.
 
+## Orientation models and evidence
+
+The phone uses Apple's built-in `VNDetectHumanBodyPose3DRequest` and
+`VNDetectHumanBodyPoseRequest`. There is no LLM or downloaded model for facing
+direction, and an LLM does not choose the floor mark. Apple manages the pose
+networks behind those APIs; this repository does not select a network checkpoint.
+
+For upright exercises, the 3D estimate uses the plane formed by the shoulders
+and hips. The shoulder and hip axes must agree. An independent 2D check looks
+for a narrow, upright shoulder/hip profile and a confidently visible nose ahead
+of an ear. A clear profile overrides a frontal 3D reconstruction. Turning the
+head alone is insufficient: the torso must also be side-on. If a side-on torso
+is detected but its front cannot be resolved, no direction is returned. For
+push-ups the 3D head-to-hips direction is retained. The UI shows which evidence
+produced the estimate. A manual facing choice bypasses automatic inference.
+
+Profile thresholds are provisional heuristics, not a trained facing classifier.
+Diagonal and back views still depend on 3D pose accuracy. Geometry tests do not
+prove image detection accuracy; validate all eight directions on a real phone.
+There is no default that assumes the person faces the setup camera.
+
+Only stable estimates refresh a recommendation. Missing or continuously
+conflicting readings expire it after two seconds and prevent locking it.
+
 ## Fixed presets
 
 | Exercise | Desired view | Lens height above floor |
@@ -57,7 +81,8 @@ marks do not support a precise measurement. No angle is shown until a stable
 direction estimate is available; it is not a body-joint angle.
 
 The Vision estimate must be stable across at least three samples and requires
-visible head, shoulders, hips, and ankles. If it is unclear, the app gives no
+visible head, shoulders, hips, and ankles. The 2D check rejects multiple people
+and requires confident torso landmarks for upright exercises. If it is unclear, the app gives no
 new mark and asks for a clearer view. The 3D estimate, camera-axis mapping,
 and push-up direction require verification with a real iPhone and subjects
 facing all eight directions before use with patients. A physiotherapist should
