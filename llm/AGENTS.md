@@ -1,41 +1,7 @@
-# Physio video coach: project instructions
+# Measurement feedback component
 
-## Purpose and first version
+The current feedback service accepts the exercise type, signed horizontal camera angle, and three ordered start/peak/finish measurement snapshots. The iOS measurement team owns exercise recognition, pose tracking, and angle calculation. Do not reintroduce video upload, frame extraction, or direct provider calls from the app.
 
-Build a patient-facing tool that accepts a completed video of a physiotherapy exercise and the exercise name. A Python backend analyses the movement with a vision-capable GPT model through the OpenAI API, then uses ElevenLabs to speak brief, practical feedback. In this project, "ChatGPT" means an OpenAI API model, not the ChatGPT web app. Keep the model ID configurable.
+Keep measurement validation and cue eligibility deterministic on the server. The OpenAI model may choose only from eligible cue IDs; validate its output before constructing displayed or spoken advice. Send only approved speech text to ElevenLabs. A failed speech request must leave written feedback available. Keep provider credentials server-side and requests to OpenAI non-stored where supported.
 
-The first version analyses uploads after recording. It gives one or two form cues and does not provide live coaching, diagnose conditions, or maintain a video history. The exercise name is the only exercise metadata supplied by the patient; do not assume a particular prescribed variation when the name is ambiguous.
-
-## Required workflow
-
-1. Validate the upload before processing it. Reject unsupported, oversized, empty, or corrupt videos with a clear message.
-2. Extract representative frames across the movement and retain their timestamps. Preserve enough context to judge the visible motion; do not treat a single frame as a complete exercise.
-3. Send the exercise name and timestamped frames to a vision-capable GPT model using the OpenAI Responses API. Request a structured result and set `store: false` where supported.
-4. Validate the model result before displaying it or sending any text to ElevenLabs. Synthesize only the approved `spoken_text` field.
-5. Return the feedback text and playable audio. If speech generation fails, keep the validated text available and show a clear audio error.
-6. Remove temporary video and extracted frames when processing finishes, including after failures.
-
-Keep video processing, OpenAI analysis, and ElevenLabs speech generation in separate Python modules. Read provider credentials, model IDs, voice ID, and other provider settings from server-side environment variables. Never expose API keys to the browser or commit them to the repository.
-
-## Feedback contract
-
-Use a typed, validated result with these fields:
-
-- `status`: `assessable` or `unable_to_assess`.
-- `observations`: brief descriptions of movement actually visible in the clip, with timestamps when useful.
-- `cues`: zero to two specific, actionable improvements grounded in those observations.
-- `spoken_text`: a short, plain-language script consistent with the validated observations and cues.
-
-If the person, relevant body parts, movement, or intended exercise variation cannot be judged, use `unable_to_assess`. In that case, avoid form corrections and ask for a clearer clip or clarification. Handle model refusal, incomplete output, malformed data, and provider timeouts as explicit outcomes; never pass unvalidated model text to speech generation.
-
-## Patient safety and privacy
-
-Describe only what the video supports. Do not infer pain, injury, diagnosis, clinical progress, joint angles, or exercise success from limited footage. Do not prescribe treatment or claim that the feedback is clinically validated. Make clear that the patient should stop and consult their physiotherapist if an exercise causes pain or the feedback conflicts with their prescribed plan.
-
-Do not retain uploaded clips, frames, or generated audio as a user history in the first version. Clean up local temporary media promptly. `store: false` controls OpenAI response storage where supported; it does not promise zero retention by OpenAI or ElevenLabs. Document third-party data handling accurately from their current settings and terms before release.
-
-## Verification and documentation
-
-Test the pipeline with mocked providers for a clear clip, an unclear clip, unsupported or corrupt input, malformed or refused model output, and an ElevenLabs failure. Verify that temporary media is removed on both success and failure and that unvalidated text never reaches speech generation.
-
-Before presenting the tool as reliable patient guidance, have a physiotherapist review a small set of representative exercise clips and the resulting feedback. Keep this root file for project-wide rules. Put setup instructions, API details, and evolving implementation notes in the README or narrower documentation.
+The provisional camera-view windows and hip-offset tolerance need measurement-team validation. Three snapshots do not establish a complete repetition; describe only the supplied measurements. Do not infer pain, injury, diagnosis, or treatment. Before presenting feedback as reliable patient guidance, obtain physiotherapist review. Keep setup and API details in the README.

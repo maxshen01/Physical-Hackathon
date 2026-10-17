@@ -1,59 +1,120 @@
-# Physio video coach
+# Three-stage exercise feedback
 
-A local demo that takes a short video and exercise name, analyses sampled frames with an OpenAI vision model, and returns brief written feedback and ElevenLabs speech. It is a prototype for patient self-practice, not a clinically validated assessment or treatment plan.
+This hosted FastAPI service accepts **measurements**, not images or video. The iOS measurement pipeline supplies an exercise ID, the signed horizontal camera angle, and start/peak/finish snapshots. The server compares peak values with provisional form thresholds, asks an OpenAI model to choose up to two eligible cues, then uses ElevenLabs to speak the approved text. It is a prototype, not clinically validated guidance.
 
-## Install and run on Windows
+## Run
 
-1. Install [Python 3.11 or newer](https://www.python.org/downloads/) and [FFmpeg](https://ffmpeg.org/download.html). Make sure `python`, `ffmpeg`, and `ffprobe` are on PATH. Open a new PowerShell terminal and check:
+From the repository root (`Physical Hackathon`), install Python 3.11+ and run in Git Bash:
 
-   ```powershell
-   python --version
-   ffmpeg -version
-   ffprobe -version
-   ```
+```bash
+python -m venv .venv
+./.venv/Scripts/python.exe -m pip install -r llm/requirements-dev.txt
+cp -n llm/.env.example llm/.env
+# Fill OPENAI_API_KEY, ELEVENLABS_API_KEY, and ELEVENLABS_VOICE_ID in llm/.env.
+./.venv/Scripts/python.exe -m uvicorn llm.physio_coach.main:app --reload
+./.venv/Scripts/python.exe -m pytest -q llm/tests
+```
 
-2. From the repository root, set up the Python environment:
+Run the commands from the repository root so Python can import `llm.physio_coach`. The service loads `llm/.env`, not the root `.env`; environment variables already set in the server process take precedence. The root `.env.example` is for the separate classifier. After changing credentials, stop and restart the API; you do not need to repeat installation.
 
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-   Copy-Item .env.example .env
-   ```
+Deploy the same ASGI app behind HTTPS for the iPhone. Configure its base URL in the app's **Hosted feedback service** setting. Provider keys remain on the server. `OPENAI_MODEL` and `ELEVENLABS_MODEL_ID` are configurable.
 
-3. Edit `.env` with your `OPENAI_API_KEY`, `ELEVENLABS_API_KEY`, and `ELEVENLABS_VOICE_ID`. `OPENAI_MODEL` defaults to `gpt-6-astra`; the model must support image input and Structured Outputs. The ElevenLabs model ID is also configurable. A ChatGPT subscription does not supply an OpenAI API key.
+## API
 
-4. Start the local server:
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Returns `{"status":"ok"}` when the API process is running. It does not check provider credentials. |
+| `POST` | `/api/feedback` | Accepts three measurement snapshots and returns written feedback plus optional MP3 audio. |
 
-   ```powershell
-   .\.venv\Scripts\python.exe -m uvicorn physio_coach.main:app --reload
-   ```
+Send `POST /api/feedback` with `Content-Type: application/json`. For example, from the repository root:
 
-   Open <http://127.0.0.1:8000>. To run automated tests:
+```bash
+curl -sS -X POST http://127.0.0.1:8000/api/feedback \
+  -H 'Content-Type: application/json' \
+  --data '{"exercise":"squat","camera_angle_deg":90,"snapshots":[{"phase":"start","knee_left_deg":171},{"phase":"peak","knee_left_deg":112,"torso_inclination_deg":49},{"phase":"finish","knee_left_deg":173}]}'
+```
 
-   ```powershell
-   .\.venv\Scripts\python.exe -m pytest -q
-   ```
+### Request body
 
-## How the demo works
+`POST /api/feedback` takes JSON. The three snapshots must be ordered and labelled `start`, `peak`, `finish`. `peak` means deepest squat, lowest push-up, or highest lateral raise. The camera angle is horizontal relative to the exerciser: 0° front, ±90° side, ±180° back. All `*_deg` values are finite numbers from 0 to 180; unavailable measurements may be `null` or omitted. Hip offsets are finite signed torso lengths, positive toward image-up.
 
-`POST /api/analyse` accepts multipart fields `video` and `exercise_name`. Videos must be MP4, MOV, or WebM, no longer than 30 seconds or larger than 50 MB. The server checks that the video decodes, extracts 12 timestamped JPEG frames, and sends only the exercise name and frames to the OpenAI Responses API. The first version makes qualitative observations; it does not count repetitions or calculate joint angles.
+```json
+{
+  "exercise": "squat",
+  "camera_angle_deg": 90,
+  "snapshots": [
+    {"phase": "start", "knee_left_deg": 171},
+    {"phase": "peak", "knee_left_deg": 112, "torso_inclination_deg": 49},
+    {"phase": "finish", "knee_left_deg": 173}
+  ]
+}
+```
 
-The API returns `feedback` with `status`, `observations`, `cues`, and `spoken_text`, plus base64 encoded MP3 in `audio_base64` when speech succeeds. `status` is `assessable` or `unable_to_assess`; the latter has no form cues. If ElevenLabs fails or is not configured, the validated written feedback remains available with an `audio_error`. Video, frames, and audio are not kept as a local history.
+| Field | Type | Requirements |
+| --- | --- | --- |
+| `exercise` | string | One of `squat`, `pushup`, `lateral_raise`. |
+| `camera_angle_deg` | number | Finite, from -180 to 180 degrees. |
+| `snapshots` | array | Exactly three objects, ordered `start`, `peak`, `finish`. |
+| `snapshots[].phase` | string | The snapshot's stage: `start`, `peak`, or `finish`. |
+| Exercise measurement fields | number or `null` | Use only fields listed for that exercise below. Omit unavailable values or send `null`. |
 
-The GPT model has no callable tools in this version. The Python service invokes FFmpeg, OpenAI, and ElevenLabs in sequence. The spoken script is assembled from validated cues, so a separate unvalidated model script cannot be sent to ElevenLabs.
+Supported exercise-specific fields:
 
-## Safety and data handling
+| Exercise | Snapshot fields |
+| --- | --- |
+| `squat` | `knee_left_deg`, `knee_right_deg`, `torso_inclination_deg` |
+| `pushup` | `elbow_left_deg`, `elbow_right_deg`, `body_alignment_left_deg`, `body_alignment_right_deg`, `hip_offset_left_torso_lengths`, `hip_offset_right_torso_lengths` |
+| `lateral_raise` | `arm_left_deg`, `arm_right_deg`, `arm_difference_deg` |
 
-The UI tells patients to stop and consult their physiotherapist if exercise causes pain or if advice conflicts with their prescribed plan. An exercise name alone may not identify the prescribed variation; unclear clips receive a request for a clearer video. A physiotherapist must review representative clips and feedback before the demo is presented as reliable patient guidance.
+If both arm angles and their difference are supplied, the difference must match within 1°. Unknown fields, measurements for another exercise, invalid numbers, and wrong stage counts/order return 422. Other camera views or missing peak measurements return `unable_to_assess` with no form cues.
 
-The app sends sampled video frames to OpenAI and feedback text to ElevenLabs. Temporary local files are removed after each request, including failures. OpenAI requests use `store: false`, which does not itself guarantee zero provider retention; see [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data). ElevenLabs has its own [logging and retention controls](https://elevenlabs.io/docs/api-reference/text-to-speech/stream); its zero retention option is subject to account eligibility. Review both providers' current terms and settings before using real patient footage. Do not use identifiable patient clips in a demo without appropriate permission.
+### Response body
 
-## Current validation state
+Successful analysis returns HTTP 200. The model may choose zero, one, or two eligible cues, so the exact observations and cues can vary. This example shows a response when it selects the squat depth cue; the MP3 value is shortened for readability:
 
-- [x] Python API, upload page, video processing, structured feedback, and speech integration implemented.
-- [x] Automated tests pass with mocked provider calls.
-- [ ] Install Python and FFmpeg on the demo machine and test a real short clip.
-- [ ] Configure live OpenAI and ElevenLabs credentials and verify browser audio playback.
-- [ ] Have a physiotherapist review representative clips and feedback.
+```json
+{
+  "feedback": {
+    "status": "assessable",
+    "observations": ["At the deepest squat, the measured knee angle stayed above 100° on each available side."],
+    "cues": ["Go deeper"],
+    "spoken_text": "Based on these measurements, try this. Go deeper."
+  },
+  "audio_base64": "SUQz...",
+  "audio_mime_type": "audio/mpeg",
+  "audio_error": null
+}
+```
 
-The live checks are pending because this environment has no configured provider credentials or FFmpeg on PATH. A temporary Python installation was used to run the automated tests.
+`feedback.status` is `assessable` when the view and peak measurements permit review; it does not mean a correction was found. It is `unable_to_assess` when the camera view or peak measurements are insufficient. In that case, `cues` is empty and `observations` explains why. `spoken_text` is the approved script sent to ElevenLabs. `audio_base64` contains a base64-encoded MP3 when speech succeeds; decode it before playback.
+
+Speech failure still returns HTTP 200 with written feedback. For example:
+
+```json
+{
+  "feedback": {
+    "status": "assessable",
+    "observations": ["Peak-stage measurements were available for review."],
+    "cues": [],
+    "spoken_text": "These measurements do not support a specific correction. Please follow your physiotherapist's plan."
+  },
+  "audio_base64": null,
+  "audio_mime_type": null,
+  "audio_error": "Speech could not be generated. The written feedback is available."
+}
+```
+
+If speech settings are missing, `audio_error` instead names the missing environment variables. Provider failure details are logged on the server and are not included in the API response.
+
+| HTTP status | Meaning |
+| --- | --- |
+| `200` | Feedback returned, with or without audio. Inspect `feedback.status` and `audio_error`. |
+| `422` | Request body failed validation. FastAPI returns a `detail` array describing the invalid fields. |
+| `502` | The OpenAI cue selection failed or returned unusable feedback. |
+| `503` | Required OpenAI settings are missing when cue selection is needed. |
+
+## Rule policy
+
+Only peak measurements trigger cues. Start and finish values are context, not averaged with peak. The provisional targets are: squat knee ≤100° and torso inclination ≤45°; push-up elbow ≤90°, body alignment 165–180°, with hip offset beyond ±0.1 torso lengths for a directional hip cue; lateral raise arm 80–100° and arm difference ≤10°. A shared left/right cue requires every available side to cross the same boundary. Squat and push-up cues require a camera angle within 30° of side view; lateral-raise cues require within 30° of front view. The 30° and ±0.1 cutoffs need validation with the measurement team.
+
+The LLM receives measurements and eligible cue IDs, never media. It may select zero to two eligible IDs. The server checks the selection and builds speech from approved cue text; no model-written script reaches ElevenLabs. OpenAI requests use `store: false`. This does not itself guarantee zero provider retention. Do not use identifiable patient data without appropriate permission; have a physiotherapist review representative feedback before presenting it as reliable guidance.

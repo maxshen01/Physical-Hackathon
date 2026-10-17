@@ -27,7 +27,13 @@ def synthesize_speech(
                 headers={"xi-api-key": api_key, "Content-Type": "application/json"},
                 json={"text": text, "model_id": model_id},
             ) as response:
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    detail = response.read().decode("utf-8", errors="replace")
+                    raise SpeechError(
+                        f"ElevenLabs returned HTTP {response.status_code}: {detail}"
+                    ) from exc
                 for chunk in response.iter_bytes():
                     size += len(chunk)
                     if size > MAX_AUDIO_BYTES:

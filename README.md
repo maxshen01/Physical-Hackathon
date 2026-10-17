@@ -1,6 +1,6 @@
 # Kinevoa
 
-Live exercise recognition for **Squat, Push-up, Lateral raise, or Unknown**.
+Live exercise recognition for **Squat, Push-up, Lateral raise, or Unknown**, plus a separate three-stage voice-feedback service.
 
 ## Components
 
@@ -8,9 +8,10 @@ Live exercise recognition for **Squat, Push-up, Lateral raise, or Unknown**.
 | --- | --- |
 | [classifier/](classifier/) | Installable Python inference package, HTTP server, browser client, tests and evaluation tools |
 | [ios/](ios/) | Standalone iPhone camera app and native session-lock tests |
+| [llm/](llm/) | Hosted measurement-based feedback API with OpenAI cue selection and ElevenLabs speech |
 | [contracts/](contracts/) | Shared HTTP interface and generated OpenAPI schema |
 
-The iPhone app depends only on the HTTP contract. It has no Python, model-weight or provider-key dependency. Additional clients can use that contract; additional inference providers belong behind the classifier API. Branding kits and presentation materials are excluded.
+The iPhone app uses HTTP contracts for recognition and feedback. It has no Python, model-weight or provider-key dependency. The feedback screen becomes available when the measurement team supplies three stage snapshots. Branding kits and presentation materials are excluded.
 
 ## Run the classifier
 

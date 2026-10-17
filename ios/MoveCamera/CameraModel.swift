@@ -15,6 +15,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     @Published var evidenceSource: String?
     @Published var lockCandidate = "Unknown"
     @Published var message = "Keep your whole body in view."
+    @Published var reviewInput: FeedbackRequest?
     private let queue = DispatchQueue(label: "move.camera")
     private var configured = false
     private var active = false
@@ -49,7 +50,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
                     self.generation += 1
                     self.active = true
                     self.session.startRunning()
-                    self.publish { self.exercise = "Unknown"; self.confidence = 0; self.labelLocked = false; self.cloudConfirmed = false; self.agreeingReadings = 0; self.liveScore = nil; self.evidenceSource = nil; self.lockCandidate = "Unknown"; self.running = true; self.message = "Move slowly. Keep your whole body in view." }
+                    self.publish { self.exercise = "Unknown"; self.confidence = 0; self.labelLocked = false; self.cloudConfirmed = false; self.agreeingReadings = 0; self.liveScore = nil; self.evidenceSource = nil; self.lockCandidate = "Unknown"; self.reviewInput = nil; self.running = true; self.message = "Move slowly. Keep your whole body in view." }
                 } catch { self.publish { self.message = error.localizedDescription } }
             }
         }
@@ -79,10 +80,17 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             self.history.reset()
             self.movementSessionID = UUID().uuidString
             self.publish {
-                self.exercise = "Unknown"; self.confidence = 0; self.labelLocked = false; self.cloudConfirmed = false; self.agreeingReadings = 0; self.liveScore = nil; self.evidenceSource = nil; self.lockCandidate = "Unknown"
+                self.exercise = "Unknown"; self.confidence = 0; self.labelLocked = false; self.cloudConfirmed = false; self.agreeingReadings = 0; self.liveScore = nil; self.evidenceSource = nil; self.lockCandidate = "Unknown"; self.reviewInput = nil
                 self.message = "Keep moving until the bar turns green."
             }
         }
+    }
+
+    /// Handoff for the measurement team. The caller supplies the locked exercise,
+    /// signed camera angle, and start/peak/finish snapshots; no sample data is used.
+    func prepareFeedback(exercise: String, cameraAngleDeg: Double, snapshots: [FeedbackSnapshot]) {
+        let input = FeedbackRequest(exercise: exercise, cameraAngleDeg: cameraAngleDeg, snapshots: snapshots)
+        publish { self.reviewInput = input }
     }
 
     private func configure() throws {

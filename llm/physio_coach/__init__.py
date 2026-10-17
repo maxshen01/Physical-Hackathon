@@ -1,2 +1,2 @@
-"""Patient-facing exercise video feedback demo."""
+"""Measurement-based exercise feedback service."""
 

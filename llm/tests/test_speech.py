@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from physio_coach import speech
+from llm.physio_coach import speech
 
 
 def test_speech_sends_only_text_and_returns_mp3(monkeypatch):
@@ -34,11 +34,13 @@ def test_speech_http_failure_is_reported(monkeypatch):
         speech.httpx,
         "Client",
         lambda **kwargs: real_client(
-            transport=httpx.MockTransport(lambda _request: httpx.Response(503)),
+            transport=httpx.MockTransport(
+                lambda _request: httpx.Response(503, json={"detail": "quota exceeded"})
+            ),
             **kwargs,
         ),
     )
 
-    with pytest.raises(speech.SpeechError):
+    with pytest.raises(speech.SpeechError, match="ElevenLabs returned HTTP 503: .*quota exceeded"):
         speech.synthesize_speech("Try again.", "secret", "voice", "model")
 

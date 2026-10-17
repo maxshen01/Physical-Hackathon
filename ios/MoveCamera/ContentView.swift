@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var camera = CameraModel()
     @AppStorage("backendAddress") private var address = "https://172.20.10.3:8443"
+    @AppStorage("feedbackAddress") private var feedbackAddress = ""
     @State private var settings = false
     @Environment(\.scenePhase) private var scenePhase
     private let ink = Color(red: 0.09, green: 0.14, blue: 0.11)
@@ -73,9 +74,16 @@ struct ContentView: View {
                 Section("Laptop server") {
                     TextField("https://172.20.10.3:8443", text: $address).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
                 }
+                Section("Hosted feedback service") {
+                    TextField("https://feedback.example.com", text: $feedbackAddress).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                    Text("The app sends the exercise, camera angle, and three measurement snapshots to this HTTPS service when you tap Review. Provider keys stay on the server.")
+                }
                 Section("Recognition") { Text("Model confidence updates with each frame and can show an exercise below the acceptance threshold. It is a model score, not measured accuracy. Session agreement measures accepted predictions across the last 10 readings. At 90%, the label locks and classification uploads pause until you tap Re-classify. After 20 seconds without a lock, the optional AI fallback checks two separate frame sequences. Its agreement is shown as 2/2, not an accuracy percentage.") }
                 Section { Text("Use the laptop’s HTTPS Wi-Fi address. Frames are sent securely to this server for recognition and are not saved by the app. If the OpenAI fallback is configured, a few recent frames may be sent to OpenAI after 20 seconds. The key stays on the laptop.") }
             }.navigationTitle("Connection").toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { camera.stop(); settings = false } } } }
+        }
+        .sheet(item: $camera.reviewInput) { input in
+            FeedbackReviewView(input: input, baseAddress: feedbackAddress)
         }
         .onChange(of: scenePhase) { _, phase in if phase != .active { camera.stop() } }
     }

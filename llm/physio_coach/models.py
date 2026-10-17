@@ -1,8 +1,72 @@
-"""Validated feedback shared by the API and provider integrations."""
+"""Validated measurement input and feedback returned by the API."""
 
+import math
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+Exercise = Literal["squat", "pushup", "lateral_raise"]
+Phase = Literal["start", "peak", "finish"]
+Angle = float | None
+
+
+class Snapshot(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+    phase: Phase
+    knee_left_deg: Angle = Field(default=None, ge=0, le=180)
+    knee_right_deg: Angle = Field(default=None, ge=0, le=180)
+    torso_inclination_deg: Angle = Field(default=None, ge=0, le=180)
+    elbow_left_deg: Angle = Field(default=None, ge=0, le=180)
+    elbow_right_deg: Angle = Field(default=None, ge=0, le=180)
+    body_alignment_left_deg: Angle = Field(default=None, ge=0, le=180)
+    body_alignment_right_deg: Angle = Field(default=None, ge=0, le=180)
+    hip_offset_left_torso_lengths: float | None = None
+    hip_offset_right_torso_lengths: float | None = None
+    arm_left_deg: Angle = Field(default=None, ge=0, le=180)
+    arm_right_deg: Angle = Field(default=None, ge=0, le=180)
+    arm_difference_deg: Angle = Field(default=None, ge=0, le=180)
+
+    @model_validator(mode="after")
+    def arm_difference_matches(self) -> "Snapshot":
+        if all(value is not None for value in (self.arm_left_deg, self.arm_right_deg, self.arm_difference_deg)):
+            expected = abs(self.arm_left_deg - self.arm_right_deg)
+            if not math.isclose(self.arm_difference_deg, expected, abs_tol=1.0):
+                raise ValueError("arm_difference_deg must match the two arm angles")
+        return self
+
+
+class FeedbackRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+    exercise: Exercise
+    camera_angle_deg: float = Field(ge=-180, le=180)
+    snapshots: list[Snapshot] = Field(min_length=3, max_length=3)
+
+    @field_validator("snapshots")
+    @classmethod
+    def correct_order(cls, snapshots: list[Snapshot]) -> list[Snapshot]:
+        if [item.phase for item in snapshots] != ["start", "peak", "finish"]:
+            raise ValueError("snapshots must be ordered start, peak, finish")
+        return snapshots
+
+    @model_validator(mode="after")
+    def metrics_match_exercise(self) -> "FeedbackRequest":
+        allowed = {
+            "squat": {"knee_left_deg", "knee_right_deg", "torso_inclination_deg"},
+            "pushup": {
+                "elbow_left_deg", "elbow_right_deg", "body_alignment_left_deg",
+                "body_alignment_right_deg", "hip_offset_left_torso_lengths",
+                "hip_offset_right_torso_lengths",
+            },
+            "lateral_raise": {"arm_left_deg", "arm_right_deg", "arm_difference_deg"},
+        }[self.exercise]
+        for snapshot in self.snapshots:
+            supplied = snapshot.model_dump(exclude_none=True, exclude={"phase"})
+            if supplied.keys() - allowed:
+                raise ValueError("Snapshot contains measurements for another exercise")
+        return self
 
 
 class Feedback(BaseModel):
@@ -32,28 +96,20 @@ class Feedback(BaseModel):
     @model_validator(mode="after")
     def status_matches_cues(self) -> "Feedback":
         if self.status == "unable_to_assess" and self.cues:
-            raise ValueError("Unassessable clips cannot have form cues")
+            raise ValueError("Unassessable measurements cannot have form cues")
         if self.cues and not self.observations:
-            raise ValueError("Form cues require visible observations")
+            raise ValueError("Form cues require measured observations")
         return self
 
 
 def approved_feedback(feedback: Feedback) -> Feedback:
-    """Build speech from validated cues so it cannot contradict the displayed advice."""
+    """Build the spoken script solely from server-approved cues."""
     if feedback.status == "unable_to_assess":
-        speech = (
-            "I can't assess this movement clearly. Please try a new clip that shows "
-            "your whole movement and the relevant body parts."
-        )
+        speech = "I can't give reliable form feedback from these measurements. Please check the camera view and try again."
     elif not feedback.cues:
-        speech = (
-            "I can see the movement, but I can't suggest a specific correction "
-            "from this clip. Please check your form with your physiotherapist."
-        )
+        speech = "These measurements do not support a specific correction. Please follow your physiotherapist's plan."
     else:
-        speech = "From what I can see, here is something to try. "
-        speech += feedback.cues[0].rstrip(" .") + "."
+        speech = "Based on these measurements, try this. " + feedback.cues[0].rstrip(" .") + "."
         if len(feedback.cues) == 2:
             speech += " Also, " + feedback.cues[1].rstrip(" .") + "."
     return feedback.model_copy(update={"spoken_text": speech})
-

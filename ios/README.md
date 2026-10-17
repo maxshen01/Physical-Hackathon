@@ -16,6 +16,27 @@ The public `MoveCamera/move-demo-ca.cer` is bundled as a resource. URLSession ac
 
 Camera frames are not written to disk by the app. Stop or backgrounding the app stops the capture session and cancels in-flight requests. Camera permission and local-network access must be allowed on the phone.
 
+## Three-stage voice feedback handoff
+
+The feedback service is separate from the laptop classifier. Set its hosted HTTPS base URL in **Connection → Hosted feedback service**. The app uses normal system certificate trust for that URL; OpenAI and ElevenLabs keys stay on the server. See [the feedback API](../llm/README.md) for the JSON contract and provisional form thresholds.
+
+The measurement team calls `CameraModel.prepareFeedback(exercise:cameraAngleDeg:snapshots:)` with the canonical exercise ID, signed horizontal camera angle (0° front, ±90° side, ±180° back), and three `FeedbackSnapshot` values ordered `.start`, `.peak`, `.finish`. Use the exact metric properties in `FeedbackProtocol.swift`; leave unavailable values as `nil`. Supplying this input opens the review screen. The user taps **Review** to request written feedback and ElevenLabs audio. No sample readings are built into the app, and the current classifier does not yet supply these measurements.
+
+On a Mac, run the contract check and unsigned build:
+
+```sh
+mkdir -p .cache/swift-module-cache
+xcrun swiftc -parse-as-library -module-cache-path .cache/swift-module-cache \
+  ios/MoveCamera/FeedbackProtocol.swift ios/Tests/FeedbackContractTests.swift \
+  -o .cache/feedback-contract-tests
+.cache/feedback-contract-tests
+xcodebuild -project ios/MoveCamera.xcodeproj -scheme MoveCamera \
+  -sdk iphonesimulator -configuration Debug -derivedDataPath .cache/ios-build \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+A physical phone is needed to check the hosted connection and audio playback after the measurement pipeline is connected.
+
 Unsigned build check:
 
 ```sh
@@ -24,4 +45,4 @@ xcodebuild -project ios/MoveCamera.xcodeproj \
   -derivedDataPath .cache/ios-build CODE_SIGNING_ALLOWED=NO build
 ```
 
-This check passed. A physical phone is required to validate camera capture, permissions, server reachability, and exercise results. The backend classifier is experimental and may return Unknown on real-world footage.
+Run this check on a Mac after adding the feedback files. A physical phone is required to validate camera capture, permissions, server reachability, exercise results, and feedback playback. The backend classifier is experimental and may return Unknown on real-world footage.

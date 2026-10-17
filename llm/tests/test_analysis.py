@@ -1,84 +1,56 @@
+"""Provider selection tests; imports keep the existing local llm package path."""
+
 import json
 from types import SimpleNamespace
 
 import pytest
 
-from physio_coach import analysis
-from physio_coach.video import Frame
+from llm.physio_coach import analysis
+from llm.physio_coach.rules import evaluate
+from llm.physio_coach.models import FeedbackRequest
 
 
-def test_analysis_sends_timestamped_frames_and_nonstored_request(monkeypatch, tmp_path):
-    image = tmp_path / "frame.jpg"
-    image.write_bytes(b"jpeg-image")
+def sample():
+    request = FeedbackRequest.model_validate({
+        "exercise": "squat", "camera_angle_deg": 90,
+        "snapshots": [
+            {"phase": "start", "knee_left_deg": 170},
+            {"phase": "peak", "knee_left_deg": 120},
+            {"phase": "finish", "knee_left_deg": 175},
+        ],
+    })
+    return request, evaluate(request).candidates
+
+
+def test_selection_sends_stages_candidates_and_nonstored_request(monkeypatch):
     captured = {}
 
     class FakeResponses:
         def create(self, **kwargs):
             captured.update(kwargs)
-            return SimpleNamespace(
-                status="completed",
-                output_text=json.dumps(
-                    {
-                        "status": "assessable",
-                        "observations": ["The movement is visible."],
-                        "cues": ["Keep your feet flat"],
-                        "spoken_text": "A model-written script.",
-                    }
-                ),
-            )
+            return SimpleNamespace(status="completed", output_text='{"cue_ids":["squat_depth"]}')
 
-    monkeypatch.setattr(
-        analysis,
-        "OpenAI",
-        lambda **_kwargs: SimpleNamespace(responses=FakeResponses()),
-    )
-    feedback = analysis.analyse_frames(
-        "Sit to stand", [Frame(1.5, image)], "test-key", "test-model"
-    )
-
-    assert captured["model"] == "test-model"
+    monkeypatch.setattr(analysis, "OpenAI", lambda **_kwargs: SimpleNamespace(responses=FakeResponses()))
+    request, candidates = sample()
+    assert analysis.choose_cues(request, candidates, "key", "model") == ["squat_depth"]
     assert captured["store"] is False
-    content = captured["input"][0]["content"]
-    assert "Sit to stand" in content[0]["text"]
-    assert "1.50 seconds" in content[1]["text"]
-    assert content[2]["image_url"].startswith("data:image/jpeg;base64,")
-    assert feedback.spoken_text != "A model-written script."
+    payload = json.loads(captured["input"][0]["content"][0]["text"])
+    assert [item["phase"] for item in payload["snapshots"]] == ["start", "peak", "finish"]
+    assert payload["eligible_cues"][0]["id"] == "squat_depth"
+    assert "image_url" not in str(captured)
 
 
-@pytest.mark.parametrize(
-    "status,output",
-    [
-        ("completed", ""),
-        ("incomplete", "{}"),
-        ("completed", '{"status":"assessable","cues":"wrong"}'),
-        (
-            "completed",
-            json.dumps(
-                {
-                    "status": "unable_to_assess",
-                    "observations": [],
-                    "cues": ["Invented correction"],
-                    "spoken_text": "Bad advice",
-                }
-            ),
-        ),
-    ],
-)
-def test_analysis_rejects_refused_incomplete_or_invalid_output(
-    monkeypatch, tmp_path, status, output
-):
-    image = tmp_path / "frame.jpg"
-    image.write_bytes(b"jpeg-image")
-    monkeypatch.setattr(
-        analysis,
-        "OpenAI",
-        lambda **_kwargs: SimpleNamespace(
-            responses=SimpleNamespace(
-                create=lambda **_params: SimpleNamespace(status=status, output_text=output)
-            )
-        ),
-    )
-
+@pytest.mark.parametrize("status,output", [
+    ("incomplete", '{"cue_ids":[]}'),
+    ("completed", ""),
+    ("completed", '{"cue_ids":["made_up"]}'),
+    ("completed", '{"cue_ids":["squat_depth","squat_depth"]}'),
+    ("completed", '{"cue_ids":["squat_depth","x","y"]}'),
+    ("completed", '{"cue_ids":"squat_depth"}'),
+])
+def test_invalid_selection_is_rejected(monkeypatch, status, output):
+    monkeypatch.setattr(analysis, "OpenAI", lambda **_kwargs: SimpleNamespace(
+        responses=SimpleNamespace(create=lambda **_params: SimpleNamespace(status=status, output_text=output))))
+    request, candidates = sample()
     with pytest.raises(analysis.AnalysisError):
-        analysis.analyse_frames("Sit to stand", [Frame(0.5, image)], "key", "model")
-
+        analysis.choose_cues(request, candidates, "key", "model")
