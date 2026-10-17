@@ -1,0 +1,580 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#0D1015;overflow:hidden}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="timeline.js" onerror="window.TL=null"></script>
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d');
+const W = 1920, H = 1080, D2R = Math.PI / 180;
+const COL = { bg:'#0D1015', white:'#F4F5F7', lime:'#C8F03C', gray:'#8B93A0', dim:'#4A515C',
+  panel:'rgba(19,24,31,0.92)', line:'rgba(255,255,255,0.10)', red:'#FF6B5E' };
+const MONO = '"JetBrains Mono", monospace', SANS = 'Figtree, sans-serif';
+
+// ---------- timeline (overridden by timeline.js once voiceover durations are known) ----------
+const DEFAULT_TL = { scenes: [
+  {id:'hook', dur:3.0}, {id:'brand', dur:2.4}, {id:'identify', dur:5.0}, {id:'position', dur:5.0},
+  {id:'extract', dur:5.2}, {id:'coach', dur:6.2}, {id:'end', dur:3.4}],
+  coach: {offset: 2.2, dur: 3.4, env: null} };
+const TL = window.TL || DEFAULT_TL;
+let acc = 0; for (const s of TL.scenes) { s.start = acc; acc += s.dur; }
+TL.total = acc;
+window.TOTAL = acc;
+
+// ---------- helpers ----------
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (u, a, b) => clamp((u - a) / (b - a));
+const eo = t => 1 - Math.pow(1 - clamp(t), 3);
+const eio = t => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const eback = t => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const type = (s, p) => s.slice(0, Math.floor(s.length * clamp(p)));
+
+function text(s, x, y, o = {}) {
+  const { size = 22, w = 500, fam = MONO, color = COL.white, align = 'left', ls = 0, alpha = 1, base = 'alphabetic', glow = 0 } = o;
+  X.save(); X.globalAlpha *= alpha; X.font = `${w} ${size}px ${fam}`; X.fillStyle = color;
+  X.textAlign = align; X.textBaseline = base; X.letterSpacing = ls + 'px';
+  if (glow) { X.shadowColor = color; X.shadowBlur = glow; }
+  X.fillText(s, x, y); X.restore();
+}
+function measure(s, size, w = 500, fam = MONO, ls = 0) { X.save(); X.font = `${w} ${size}px ${fam}`; X.letterSpacing = ls + 'px'; const m = X.measureText(s).width; X.restore(); return m; }
+function rrect(x, y, w, h, r) { X.beginPath(); X.roundRect(x, y, w, h, r); }
+function panel(x, y, w, h, alpha = 1, title = null, sub = null) {
+  X.save(); X.globalAlpha *= alpha;
+  rrect(x, y, w, h, 14); X.fillStyle = COL.panel; X.fill(); X.strokeStyle = COL.line; X.lineWidth = 1.5; X.stroke();
+  brackets(x, y, w, h, 16, COL.lime, 0.8);
+  if (title) { text(title, x + 28, y + 44, { size: 18, w: 700, color: COL.lime, ls: 3 });
+    if (sub) text(sub, x + 28, y + 72, { size: 15, color: COL.gray, ls: 0.5 }); }
+  X.restore();
+}
+function brackets(x, y, w, h, L, color, alpha = 1, lw = 2) {
+  X.save(); X.globalAlpha *= alpha; X.strokeStyle = color; X.lineWidth = lw; X.beginPath();
+  X.moveTo(x, y + L); X.lineTo(x, y); X.lineTo(x + L, y);
+  X.moveTo(x + w - L, y); X.lineTo(x + w, y); X.lineTo(x + w, y + L);
+  X.moveTo(x + w, y + h - L); X.lineTo(x + w, y + h); X.lineTo(x + w - L, y + h);
+  X.moveTo(x + L, y + h); X.lineTo(x, y + h); X.lineTo(x, y + h - L); X.stroke(); X.restore();
+}
+
+// ---------- background + HUD ----------
+function background(t) {
+  X.fillStyle = COL.bg; X.fillRect(0, 0, W, H);
+  X.save(); X.strokeStyle = 'rgba(255,255,255,0.035)'; X.lineWidth = 1; X.beginPath();
+  const off = (t * 6) % 60;
+  for (let x = -60 + off; x < W; x += 60) { X.moveTo(x, 0); X.lineTo(x, H); }
+  for (let y = 0; y < H; y += 60) { X.moveTo(0, y); X.lineTo(W, y); }
+  X.stroke(); X.restore();
+  // drifting dust
+  for (let i = 0; i < 60; i++) {
+    const x = (rnd(i) * W + t * (8 + rnd(i + 9) * 20)) % W, y = (rnd(i + 3) * H - t * (4 + rnd(i + 5) * 10) + H) % H;
+    X.fillStyle = `rgba(200,240,60,${0.05 + rnd(i + 7) * 0.12})`; X.fillRect(x, y, 2, 2);
+  }
+  const g = X.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 1150);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.7)');
+  X.fillStyle = g; X.fillRect(0, 0, W, H);
+}
+const STEPS = ['IDENTIFY', 'POSITION', 'EXTRACT', 'COACH'];
+function hud(t, step, alpha) {
+  if (alpha <= 0) return;
+  X.save(); X.globalAlpha = alpha;
+  brackets(36, 36, W - 72, H - 72, 34, 'rgba(255,255,255,0.35)', 1, 2);
+  text('ORBIT // CORE', 70, 82, { size: 16, w: 700, color: COL.white, ls: 4 });
+  text('PHYSIO VISION PIPELINE', 70, 106, { size: 13, color: COL.gray, ls: 3 });
+  const tc = t.toFixed(2).padStart(5, '0');
+  text(`T+00:${tc}`, W - 70, 82, { size: 16, w: 700, align: 'right', ls: 2 });
+  X.fillStyle = (Math.floor(t * 2) % 2) ? COL.red : 'rgba(255,107,94,0.3)';
+  X.beginPath(); X.arc(W - 70 - 196, 76, 6, 0, 7); X.fill();
+  text('LIVE', W - 70, 106, { size: 13, color: COL.gray, align: 'right', ls: 3 });
+  // step tracker
+  const sw = 230, gap = 16, total = STEPS.length * sw + (STEPS.length - 1) * gap, x0 = (W - total) / 2, y = 1000;
+  STEPS.forEach((s, i) => {
+    const x = x0 + i * (sw + gap), on = i === step, done = i < step;
+    X.fillStyle = on ? COL.lime : done ? 'rgba(200,240,60,0.35)' : 'rgba(255,255,255,0.12)';
+    X.fillRect(x, y, sw, 3);
+    text(`0${i + 1}  ${s}`, x, y - 14, { size: 15, w: on ? 700 : 500, color: on ? COL.lime : done ? COL.gray : COL.dim, ls: 3 });
+  });
+  X.restore();
+}
+
+// ---------- 3D skeleton ----------
+function pose3d(d, arm = 0) {
+  const as = lerp(4, 26, d) * D2R, at = lerp(4, 50, d) * D2R, ator = lerp(6, 49, d) * D2R;
+  const P = {}, sh = 46, th = 46, to = 54;
+  for (const s of [-1, 1]) {
+    const k = s < 0 ? 'L' : 'R';
+    const K = [s * 12, sh * Math.cos(as), sh * Math.sin(as)];
+    P['ankle' + k] = [s * 11, 4, 0]; P['knee' + k] = K;
+    P['hip' + k] = [s * 10, K[1] + th * Math.cos(at), K[2] - th * Math.sin(at)];
+    P['toe' + k] = [s * 13, 0, 18]; P['heel' + k] = [s * 11, 0, -5];
+  }
+  const hc = [0, P.hipL[1], P.hipL[2]];
+  const sc = [0, hc[1] + to * Math.cos(ator), hc[2] + to * Math.sin(ator)];
+  const aa = lerp(10, 82, arm) * D2R, dir = [0, -Math.cos(aa), Math.sin(aa)];
+  for (const s of [-1, 1]) {
+    const k = s < 0 ? 'L' : 'R', S = [s * 19, sc[1], sc[2]];
+    P['sh' + k] = S;
+    P['elbow' + k] = [s * 18, S[1] + 28 * dir[1], S[2] + 28 * dir[2]];
+    P['wrist' + k] = [s * 15, S[1] + 54 * dir[1], S[2] + 54 * dir[2]];
+  }
+  P.neck = [0, sc[1] + 7 * Math.cos(ator), sc[2] + 7 * Math.sin(ator)];
+  P.head = [0, sc[1] + 21 * Math.cos(ator), sc[2] + 21 * Math.sin(ator)];
+  return P;
+}
+const BONES = [['ankleL','kneeL'],['kneeL','hipL'],['ankleR','kneeR'],['kneeR','hipR'],['hipL','hipR'],
+  ['hipL','shL'],['hipR','shR'],['shL','shR'],['shL','elbowL'],['elbowL','wristL'],['shR','elbowR'],['elbowR','wristR'],
+  ['heelL','toeL'],['heelR','toeR'],['ankleL','heelL'],['ankleR','heelR']];
+function proj(p, yaw, cx, cy, sc) {
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  const x = p[0] * c - p[2] * s, z = p[0] * s + p[2] * c, k = 900 / (900 - z);
+  return [cx + x * sc * k, cy - p[1] * sc * k, z];
+}
+function drawSkeleton(P, yaw, cx, cy, sc, o = {}) {
+  const { alpha = 1, lw = 5, joint = 6, glow = 14 } = o;
+  const Q = {}; for (const k in P) Q[k] = proj(P[k], yaw, cx, cy, sc);
+  const bones = BONES.map(b => [b, (Q[b[0]][2] + Q[b[1]][2]) / 2]).sort((a, b) => a[1] - b[1]);
+  X.save(); X.globalAlpha *= alpha; X.lineCap = 'round';
+  for (const [[a, b], z] of bones) {
+    const near = clamp(0.55 + z / 40, 0.35, 1);
+    X.strokeStyle = `rgba(244,245,247,${near})`; X.lineWidth = lw; X.shadowColor = 'rgba(200,240,60,0.6)'; X.shadowBlur = glow * near;
+    X.beginPath(); X.moveTo(Q[a][0], Q[a][1]); X.lineTo(Q[b][0], Q[b][1]); X.stroke();
+  }
+  X.shadowBlur = 0;
+  // neck + head
+  X.strokeStyle = 'rgba(244,245,247,0.9)'; X.lineWidth = lw;
+  const sm = [(Q.shL[0] + Q.shR[0]) / 2, (Q.shL[1] + Q.shR[1]) / 2];
+  X.beginPath(); X.moveTo(sm[0], sm[1]); X.lineTo(Q.neck[0], Q.neck[1]); X.stroke();
+  X.beginPath(); X.arc(Q.head[0], Q.head[1], 12 * sc, 0, 7); X.stroke();
+  for (const k of ['shL','shR','elbowL','elbowR','wristL','wristR','hipL','hipR','kneeL','kneeR','ankleL','ankleR']) {
+    const near = clamp(0.55 + Q[k][2] / 40, 0.35, 1);
+    X.globalAlpha = alpha * near;
+    X.fillStyle = COL.lime; X.shadowColor = COL.lime; X.shadowBlur = 12;
+    X.beginPath(); X.arc(Q[k][0], Q[k][1], joint, 0, 7); X.fill();
+    X.shadowBlur = 0; X.fillStyle = COL.bg; X.beginPath(); X.arc(Q[k][0], Q[k][1], joint * 0.4, 0, 7); X.fill();
+  }
+  X.restore();
+  return Q;
+}
+function bbox(Q) { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const k in Q) { a = Math.min(a, Q[k][0]); b = Math.min(b, Q[k][1]); c = Math.max(c, Q[k][0]); d = Math.max(d, Q[k][1]); } return [a, b, c, d]; }
+const squatD = (u, period, phase = 0) => { const p = ((u / period + phase) % 1 + 1) % 1; return eio(p < 0.5 ? p * 2 : 2 - p * 2); };
+
+// ---------- logo ----------
+function drawLogo(cx, cy, s, p, o = {}) {
+  const { tagline = 0, glow = 0 } = o;
+  const ox = cx - 163 * s, oy = cy;
+  X.save();
+  // ring
+  const ringP = eo(seg(p, 0, 0.45));
+  X.lineWidth = 30 * s; X.strokeStyle = COL.white; X.lineCap = 'butt';
+  X.beginPath(); X.arc(ox, oy, 36 * s, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ringP); X.stroke();
+  const limeP = eo(seg(p, 0.3, 0.6));
+  if (limeP > 0) { X.strokeStyle = COL.lime; X.shadowColor = COL.lime; X.shadowBlur = glow;
+    X.beginPath(); X.arc(ox, oy, 36 * s, -Math.PI / 2, -Math.PI / 2 + Math.PI / 2 * limeP); X.stroke(); X.shadowBlur = 0; }
+  const dotP = eback(seg(p, 0.15, 0.4));
+  X.fillStyle = COL.white; X.beginPath(); X.arc(ox, oy, 9 * s * dotP, 0, 7); X.fill();
+  const camP = eback(seg(p, 0.45, 0.7));
+  if (camP > 0) {
+    const a = -Math.PI / 2 + (Math.PI / 4) * eo(seg(p, 0.45, 0.75)) + (1 - eo(seg(p, 0.45, 0.75))) * -1.2;
+    const px = ox + 43 * s * Math.cos(a), py = oy + 43 * s * Math.sin(a), r = 14 * s * camP;
+    X.fillStyle = COL.bg; X.beginPath(); X.arc(px, py, r + 3 * s, 0, 7); X.fill();
+    X.fillStyle = COL.lime; X.beginPath(); X.arc(px, py, r, 0, 7); X.fill();
+    X.strokeStyle = COL.bg; X.lineWidth = 2.6 * s; X.beginPath(); X.arc(px, py, r * 0.5, 0, 7); X.stroke();
+  }
+  // letters
+  const letters = 'rbit'; let x = ox + 58 * s;
+  X.font = `800 ${188 * s}px ${SANS}`; X.letterSpacing = `${-5 * s}px`;
+  for (let i = 0; i < letters.length; i++) {
+    const lp = eo(seg(p, 0.35 + i * 0.08, 0.7 + i * 0.08));
+    X.globalAlpha = lp; X.fillStyle = COL.white;
+    X.fillText(letters[i], x + (1 - lp) * 40 * s, oy + 51 * s);
+    x += X.measureText(letters[i]).width;
+  }
+  X.globalAlpha = 1; X.letterSpacing = '0px';
+  if (tagline > 0) {
+    const tg = 'EVERY ANGLE. EVERY REP.';
+    text(type(tg, tagline * 1.4), cx - measure(tg, 20 * s, 700, SANS, 7 * s) / 2, oy + 140 * s,
+      { size: 20 * s, w: 700, fam: SANS, color: '#9AA0A8', ls: 7 * s });
+  }
+  X.restore();
+}
+
+// ---------- scenes ----------
+function sceneHook(u, D) {
+  const cx = 960, gy = 690, sc = 2.2, yaw = (20 + u * 22) * D2R;
+  const P = pose3d(squatD(u, 2.6, 0.75) * 0.5, 0);
+  // orbit ellipse
+  X.save(); X.translate(cx, gy - 80); X.scale(1, 0.28);
+  X.strokeStyle = 'rgba(200,240,60,0.25)'; X.lineWidth = 3; X.setLineDash([10, 12]);
+  X.beginPath(); X.arc(0, 0, 340, 0, 7); X.stroke(); X.restore();
+  // camera orbiting behind/in front
+  const ca = u * 1.6 + 0.4, camx = cx + 340 * Math.cos(ca), camy = gy - 80 + 340 * 0.28 * Math.sin(ca);
+  const front = Math.sin(ca) > 0;
+  const drawCam = () => { X.save(); X.fillStyle = COL.lime; X.shadowColor = COL.lime; X.shadowBlur = 24;
+    X.beginPath(); X.arc(camx, camy, 15, 0, 7); X.fill(); X.shadowBlur = 0; X.strokeStyle = COL.bg; X.lineWidth = 3;
+    X.beginPath(); X.arc(camx, camy, 7, 0, 7); X.stroke(); X.restore(); };
+  if (!front) drawCam();
+  X.save(); X.globalAlpha = eo(seg(u, 0, 0.6));
+  drawSkeleton(P, yaw, cx, gy, sc); X.restore();
+  if (front) drawCam();
+  const line1 = "Your physio can't watch", line2 = 'every rep.';
+  const p = seg(u, 0.35, 1.6);
+  text(type(line1, p * 1.5), cx, 860, { size: 64, w: 800, fam: SANS, align: 'center', ls: -1 });
+  text(type(line2, (p - 0.62) * 2.7), cx, 936, { size: 64, w: 800, fam: SANS, align: 'center', ls: -1, color: COL.lime, glow: 18 });
+}
+
+function sceneBrand(u, D) {
+  const p = seg(u, 0, 1.6);
+  drawLogo(960, 480, 1.7, p, { glow: 20 });
+  const sub = 'AN AI CAMERA THAT COACHES YOUR FORM';
+  text(type(sub, seg(u, 0.9, 1.8)), 960, 700, { size: 22, w: 500, align: 'center', color: COL.gray, ls: 6 });
+}
+
+function phone(x, y, w, h, alpha) {
+  X.save(); X.globalAlpha *= alpha;
+  rrect(x, y, w, h, 48); X.fillStyle = '#07090C'; X.fill(); X.lineWidth = 3; X.strokeStyle = 'rgba(255,255,255,0.28)'; X.stroke();
+  rrect(x + 14, y + 14, w - 28, h - 28, 36); X.fillStyle = '#0B0E12'; X.fill();
+  rrect(x + w / 2 - 50, y + 26, 100, 26, 13); X.fillStyle = '#000'; X.fill();
+  X.restore();
+}
+
+function sceneIdentify(u, D) {
+  const pin = eo(seg(u, 0, 0.6));
+  const px = lerp(-200, 330, pin), py = 150, pw = 380, ph = 780;
+  phone(px, py, pw, ph, pin);
+  // camera feed
+  X.save(); rrect(px + 14, py + 14, pw - 28, ph - 28, 36); X.clip();
+  for (let i = 0; i < 9; i++) { X.fillStyle = 'rgba(255,255,255,0.025)'; X.fillRect(px, py + ((u * 120 + i * 90) % ph), pw, 2); }
+  const P = pose3d(squatD(u, 2.0, 0.75), squatD(u, 2.0, 0.75));
+  const Q = drawSkeleton(P, 28 * D2R, px + pw / 2, py + ph - 170, 2.3, { alpha: pin, lw: 4, joint: 5 });
+  const [a, b, c, d] = bbox(Q);
+  brackets(a - 26, b - 44, c - a + 52, d - b + 70, 18, COL.lime, pin);
+  text('PERSON 0.98', a - 26, b - 54, { size: 14, w: 700, color: COL.lime, ls: 1, alpha: pin });
+  X.restore();
+  X.fillStyle = (Math.floor(u * 3) % 2) ? COL.red : 'rgba(255,107,94,0.3)';
+  X.beginPath(); X.arc(px + 50, py + 80, 7, 0, 7); X.fill();
+  text('REAR CAM · 2 Hz', px + 64, py + 86, { size: 14, w: 700, color: COL.white, alpha: pin, ls: 1 });
+
+  // frame packets flying to classifier
+  const sx = px + pw + 20, ex = 1060;
+  for (let i = 0; i < 14; i++) {
+    const t0 = 0.6 + i * 0.3, q = seg(u, t0, t0 + 0.55);
+    if (q <= 0 || q >= 1) continue;
+    const x = lerp(sx, ex, eio(q)), y = 520 + Math.sin(q * Math.PI) * -40;
+    X.save(); X.globalAlpha = Math.sin(q * Math.PI);
+    X.strokeStyle = COL.lime; X.lineWidth = 2; X.strokeRect(x - 18, y - 14, 36, 28);
+    X.fillStyle = 'rgba(200,240,60,0.15)'; X.fillRect(x - 18, y - 14, 36, 28); X.restore();
+  }
+  text('POST /predict', (sx + ex) / 2, 470, { size: 16, w: 700, align: 'center', color: COL.lime, alpha: seg(u, 0.6, 1), ls: 1 });
+  text('JPEG ≤ 640px', (sx + ex) / 2, 600, { size: 14, align: 'center', color: COL.gray, alpha: seg(u, 0.6, 1), ls: 1 });
+
+  // classifier panel
+  const pa = eo(seg(u, 0.3, 0.9)), x0 = 1080, y0 = 170, w0 = 700, h0 = 740;
+  X.save(); X.globalAlpha = pa; X.translate((1 - pa) * 60, 0);
+  panel(x0, y0, w0, h0, 1, 'EXERCISE CLASSIFIER', 'SigLIP2 image · person crop · pose cycle');
+  const k = eo(seg(u, 0.8, 3.4)), jit = (i) => (1 - k * 0.7) * 0.04 * Math.sin(u * 11 + i * 2);
+  const bars = [['SQUAT', lerp(0.22, 0.93, k) + jit(0)], ['PUSH-UP', lerp(0.31, 0.04, k) + jit(1)],
+    ['LATERAL RAISE', lerp(0.19, 0.02, k) + jit(2)], ['UNKNOWN', lerp(0.28, 0.01, k) + jit(3)]];
+  bars.forEach(([name, v], i) => {
+    const y = y0 + 130 + i * 70, lead = i === 0 && k > 0.5;
+    text(name, x0 + 28, y, { size: 17, w: 700, color: lead ? COL.white : COL.gray, ls: 2 });
+    text(clamp(v).toFixed(2), x0 + w0 - 28, y, { size: 17, w: 700, align: 'right', color: lead ? COL.lime : COL.gray });
+    X.fillStyle = 'rgba(255,255,255,0.07)'; X.fillRect(x0 + 28, y + 14, w0 - 56, 10);
+    X.fillStyle = lead ? COL.lime : 'rgba(255,255,255,0.35)'; if (lead) { X.shadowColor = COL.lime; X.shadowBlur = 14; }
+    X.fillRect(x0 + 28, y + 14, (w0 - 56) * clamp(v), 10); X.shadowBlur = 0;
+  });
+  // agreement window
+  const ay = y0 + 440;
+  text('SESSION AGREEMENT · LAST 10', x0 + 28, ay, { size: 15, w: 700, color: COL.gray, ls: 2 });
+  let filled = 0;
+  for (let i = 0; i < 10; i++) {
+    const on = u > 0.9 + i * 0.33; if (on) filled++;
+    const isUnknown = i === 0;
+    const x = x0 + 28 + i * 64;
+    X.strokeStyle = 'rgba(255,255,255,0.18)'; X.lineWidth = 1.5; X.strokeRect(x, ay + 18, 52, 30);
+    if (on) { X.fillStyle = isUnknown ? 'rgba(255,255,255,0.22)' : COL.lime; X.fillRect(x + 4, ay + 22, 44, 22); }
+  }
+  const agree = Math.max(0, filled - 1);
+  const locked = agree >= 9;
+  text(`${agree}/10`, x0 + w0 - 28, ay, { size: 15, w: 700, align: 'right', color: locked ? COL.lime : COL.white });
+  // result line
+  const lockT = 0.9 + 9 * 0.33;
+  const lp = seg(u, lockT, lockT + 0.3);
+  const ry = y0 + 580;
+  if (lp > 0) {
+    const flash = 1 - seg(u, lockT, lockT + 0.5);
+    rrect(x0 + 28, ry, 230, 56, 8); X.fillStyle = COL.lime; X.shadowColor = COL.lime; X.shadowBlur = 20 + flash * 50; X.fill(); X.shadowBlur = 0;
+    text('● LOCKED', x0 + 48, ry + 37, { size: 22, w: 700, color: COL.bg, ls: 3 });
+    text(type('{"exercise":"squat"}', seg(u, lockT + 0.1, lockT + 0.6)), x0 + 280, ry + 37, { size: 22, w: 700, color: COL.white });
+  } else {
+    text('classifying' + '.'.repeat(1 + Math.floor(u * 4) % 3), x0 + 28, ry + 37, { size: 20, color: COL.gray });
+  }
+  text('round trip  64 ms', x0 + 28, y0 + h0 - 34, { size: 15, color: COL.gray, ls: 1 });
+  text('image + pose fallback', x0 + w0 - 28, y0 + h0 - 34, { size: 15, color: COL.gray, align: 'right', ls: 1 });
+  X.restore();
+}
+
+const MAP = [['SQUAT', 'SIDE 90°', 'HIP', '2–3 m'], ['PUSH-UP', 'SIDE 90°', '30–40 cm', '2–2.5 m'], ['LATERAL RAISE', 'FRONT 0°', 'CHEST', '2–3 m']];
+function scenePosition(u, D) {
+  // angle map table
+  const ta = eo(seg(u, 0, 0.5)), tx = 90, ty = 230, tw = 560;
+  X.save(); X.globalAlpha = ta; X.translate((ta - 1) * 60, 0);
+  panel(tx, ty, tw, 400, 1, 'ANGLE MAP', 'exercise → optimal viewpoint');
+  const cols = [28, 250, 380, 470];
+  ['EXERCISE', 'VIEW', 'HEIGHT', 'DIST'].forEach((h, i) => text(h, tx + cols[i], ty + 128, { size: 13, w: 700, color: COL.dim, ls: 2 }));
+  const scan = u < 0.95 ? Math.floor(seg(u, 0.25, 0.95) * 3.99) % 3 : 0;
+  MAP.forEach((r, i) => {
+    const y = ty + 190 + i * 70, hit = i === scan;
+    if (hit) { X.fillStyle = u > 0.95 ? 'rgba(200,240,60,0.14)' : 'rgba(255,255,255,0.06)'; X.fillRect(tx + 14, y - 38, tw - 28, 58);
+      if (u > 0.95) { X.fillStyle = COL.lime; X.fillRect(tx + 14, y - 38, 4, 58); } }
+    r.forEach((c, j) => text(c, tx + cols[j], y, { size: j === 0 ? 17 : 16, w: j === 0 ? 700 : 500, color: hit && u > 0.95 ? (j === 0 ? COL.lime : COL.white) : COL.gray, ls: j === 0 ? 1 : 0 }));
+  });
+  X.restore();
+
+  // top-down orbit
+  const cx = 960, cy = 470, R = 220;
+  const ma = eo(seg(u, 0.15, 0.7));
+  const th = lerp(28, 90, eio(seg(u, 1.0, 3.3))) * D2R;
+  X.save(); X.globalAlpha = ma;
+  X.strokeStyle = 'rgba(255,255,255,0.14)'; X.lineWidth = 2; X.setLineDash([6, 10]);
+  X.beginPath(); X.arc(cx, cy, R, 0, 7); X.stroke(); X.setLineDash([]);
+  for (let a = 0; a < 360; a += 15) {
+    const r1 = R + 12, r2 = R + (a % 90 ? 20 : 32), ar = (90 - a) * D2R;
+    X.strokeStyle = a % 90 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.45)'; X.lineWidth = 2;
+    X.beginPath(); X.moveTo(cx + r1 * Math.cos(ar), cy + r1 * Math.sin(ar)); X.lineTo(cx + r2 * Math.cos(ar), cy + r2 * Math.sin(ar)); X.stroke();
+  }
+  text('0° FRONT', cx, cy + R + 66, { size: 13, w: 700, align: 'center', color: COL.gray, ls: 2 });
+  text('90° SIDE', cx + R, cy - 48, { size: 13, w: 700, align: 'center', color: COL.gray, ls: 2 });
+  // person top-down (faces down / front)
+  X.fillStyle = 'rgba(244,245,247,0.35)'; X.beginPath(); X.roundRect(cx - 36, cy - 12, 72, 24, 12); X.fill();
+  X.fillStyle = COL.white; X.beginPath(); X.arc(cx, cy, 13, 0, 7); X.fill();
+  X.strokeStyle = COL.white; X.lineWidth = 2; X.beginPath(); X.moveTo(cx, cy + 26); X.lineTo(cx, cy + 50); X.moveTo(cx - 7, cy + 42); X.lineTo(cx, cy + 50); X.lineTo(cx + 7, cy + 42); X.stroke();
+  // target marker at 90
+  const tgx = cx + R, tgy = cy, pulse = 0.5 + 0.5 * Math.sin(u * 8);
+  X.strokeStyle = `rgba(200,240,60,${0.4 + pulse * 0.4})`; X.lineWidth = 2;
+  X.beginPath(); X.arc(tgx, tgy, 26 + pulse * 6, 0, 7); X.stroke();
+  // trail
+  const toXY = a => [cx + R * Math.sin(a), cy + R * Math.cos(a)];
+  X.strokeStyle = COL.lime; X.lineWidth = 6; X.shadowColor = COL.lime; X.shadowBlur = 16;
+  X.beginPath(); X.arc(cx, cy, R, Math.PI / 2 - th, Math.PI / 2 - 28 * D2R); X.stroke(); X.shadowBlur = 0;
+  // FOV cone
+  const [qx, qy] = toXY(th), dirA = Math.atan2(cy - qy, cx - qx);
+  const g = X.createRadialGradient(qx, qy, 0, qx, qy, R);
+  g.addColorStop(0, 'rgba(200,240,60,0.28)'); g.addColorStop(1, 'rgba(200,240,60,0)');
+  X.fillStyle = g; X.beginPath(); X.moveTo(qx, qy); X.arc(qx, qy, R * 1.05, dirA - 0.32, dirA + 0.32); X.closePath(); X.fill();
+  X.fillStyle = COL.bg; X.beginPath(); X.arc(qx, qy, 22, 0, 7); X.fill();
+  X.fillStyle = COL.lime; X.shadowColor = COL.lime; X.shadowBlur = 22; X.beginPath(); X.arc(qx, qy, 18, 0, 7); X.fill(); X.shadowBlur = 0;
+  X.strokeStyle = COL.bg; X.lineWidth = 3; X.beginPath(); X.arc(qx, qy, 8, 0, 7); X.stroke();
+  const deg = Math.round(th / D2R);
+  text(`θ ${deg}°`, qx + 30, qy + 52, { size: 18, w: 700, color: COL.lime });
+  X.restore();
+
+  // command line
+  const cmd = '> camera.move(angle=90, height="hip", distance=2.5)';
+  text(type(cmd, seg(u, 0.7, 1.7)) + (Math.floor(u * 4) % 2 ? '▌' : ''), cx, 860, { size: 22, w: 500, align: 'center', color: COL.lime });
+
+  // viewport
+  const va = eo(seg(u, 0.3, 0.9)), vx = 1300, vy = 200, vw = 520, vh = 560;
+  X.save(); X.globalAlpha = va; X.translate((1 - va) * 60, 0);
+  panel(vx, vy, vw, vh, 1, 'CAMERA FEED', null);
+  const h = lerp(1.5, 0.9, eio(seg(u, 1.3, 3.4)));
+  text(`θ ${deg}°  ·  h ${h.toFixed(2)} m`, vx + vw - 28, vy + 44, { size: 16, w: 700, align: 'right', color: COL.white });
+  X.save(); rrect(vx + 20, vy + 66, vw - 40, vh - 86, 8); X.clip();
+  X.fillStyle = '#090B0F'; X.fillRect(vx, vy, vw, vh);
+  const gy = vy + vh - 70;
+  X.strokeStyle = 'rgba(255,255,255,0.12)'; X.lineWidth = 2; X.beginPath(); X.moveTo(vx, gy); X.lineTo(vx + vw, gy); X.stroke();
+  const P = pose3d(squatD(u, 2.4, 0.75) * 0.9, squatD(u, 2.4, 0.75) * 0.9);
+  drawSkeleton(P, -th, vx + vw / 2 - 30, gy, 2.15, { lw: 4, joint: 5 });
+  // height ruler
+  const rx = vx + vw - 50, rTop = vy + 90, rBot = gy;
+  X.strokeStyle = 'rgba(255,255,255,0.3)'; X.lineWidth = 2; X.beginPath(); X.moveTo(rx, rTop); X.lineTo(rx, rBot); X.stroke();
+  for (let m = 0; m <= 2; m += 0.5) { const y = lerp(rBot, rTop, m / 2); X.beginPath(); X.moveTo(rx - 8, y); X.lineTo(rx, y); X.stroke(); text(m.toFixed(1), rx - 14, y + 5, { size: 11, align: 'right', color: COL.dim }); }
+  const my = lerp(rBot, rTop, h / 2);
+  X.fillStyle = COL.lime; X.beginPath(); X.moveTo(rx + 2, my); X.lineTo(rx + 16, my - 9); X.lineTo(rx + 16, my + 9); X.fill();
+  X.restore();
+  if (u > 3.3) { const lk = seg(u, 3.3, 3.6); rrect(vx + 28, vy + vh - 58, 190, 38, 6); X.fillStyle = `rgba(200,240,60,${lk})`; X.fill();
+    text('● VIEW LOCKED', vx + 44, vy + vh - 32, { size: 15, w: 700, color: COL.bg, ls: 2, alpha: lk }); }
+  X.restore();
+}
+
+function angleAt(A, B, Cc) { const v1 = [A[0] - B[0], A[1] - B[1]], v2 = [Cc[0] - B[0], Cc[1] - B[1]];
+  return Math.acos(clamp((v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(...v1) * Math.hypot(...v2)), -1, 1)) / D2R; }
+function arcBetween(B, A, Cc, r, color) {
+  const a1 = Math.atan2(A[1] - B[1], A[0] - B[0]), a2 = Math.atan2(Cc[1] - B[1], Cc[0] - B[0]);
+  let d = a2 - a1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+  X.save(); X.fillStyle = 'rgba(200,240,60,0.14)'; X.strokeStyle = color; X.lineWidth = 3;
+  X.beginPath(); X.moveTo(B[0], B[1]); X.arc(B[0], B[1], r, a1, a1 + d, d < 0); X.closePath(); X.fill();
+  X.beginPath(); X.arc(B[0], B[1], r, a1, a1 + d, d < 0); X.stroke(); X.restore();
+  return a1 + d / 2;
+}
+
+const PERIOD = 2.3;
+function featuresAt(u) {
+  const d = squatD(u, PERIOD, 0.75), P = pose3d(d, d);
+  const Q = {}; for (const k in P) Q[k] = proj(P[k], -90 * D2R, 0, 0, 1);
+  const knee = angleAt(Q.hipR, Q.kneeR, Q.ankleR);
+  const sm = [(Q.shL[0] + Q.shR[0]) / 2, (Q.shL[1] + Q.shR[1]) / 2], hm = [(Q.hipL[0] + Q.hipR[0]) / 2, (Q.hipL[1] + Q.hipR[1]) / 2];
+  const lean = Math.abs(Math.atan2(sm[0] - hm[0], -(sm[1] - hm[1]))) / D2R;
+  return { d, P, knee, lean };
+}
+const STATS = (() => { let k = 180, l = 0; for (let s = 0; s < PERIOD; s += 1 / 60) { const f = featuresAt(s); k = Math.min(k, f.knee); l = Math.max(l, f.lean); } return { knee: Math.round(k), lean: Math.round(l) }; })();
+function sceneExtract(u, D) {
+  const f = featuresAt(u), cx = 620, gy = 880, sc = 3.5;
+  const fade = eo(seg(u, 0, 0.5));
+  X.save(); X.globalAlpha = fade;
+  X.strokeStyle = 'rgba(255,255,255,0.15)'; X.lineWidth = 2; X.beginPath(); X.moveTo(260, gy); X.lineTo(1000, gy); X.stroke();
+  const Q = drawSkeleton(f.P, -90 * D2R, cx, gy, sc, { lw: 6, joint: 8 });
+  const kneeMid = arcBetween(Q.kneeR, Q.hipR, Q.ankleR, 56, COL.lime);
+  text(`${Math.round(f.knee)}°`, Q.kneeR[0] + 92 * Math.cos(kneeMid), Q.kneeR[1] + 92 * Math.sin(kneeMid) + 8, { size: 26, w: 700, align: 'center', color: COL.lime, glow: 10 });
+  const hm = [(Q.hipL[0] + Q.hipR[0]) / 2, (Q.hipL[1] + Q.hipR[1]) / 2], sm = [(Q.shL[0] + Q.shR[0]) / 2, (Q.shL[1] + Q.shR[1]) / 2];
+  X.setLineDash([6, 8]); X.strokeStyle = 'rgba(255,255,255,0.4)'; X.lineWidth = 2;
+  X.beginPath(); X.moveTo(hm[0], hm[1]); X.lineTo(hm[0], hm[1] - 200); X.stroke(); X.setLineDash([]);
+  const leanMid = arcBetween(hm, [hm[0], hm[1] - 100], sm, 80, COL.lime);
+  text(`${Math.round(f.lean)}°`, hm[0] + 120 * Math.cos(leanMid), hm[1] + 120 * Math.sin(leanMid), { size: 26, w: 700, align: 'center', color: COL.lime, glow: 10 });
+  [['24 HIP', 'hipR', -1], ['26 KNEE', 'kneeR', 1], ['28 ANKLE', 'ankleR', -1]].forEach(([l, k, side]) =>
+    text(l, Q[k][0] + side * 24, Q[k][1] + 6, { size: 12, w: 700, align: side < 0 ? 'right' : 'left', color: COL.gray, ls: 1 }));
+  text('SIDE VIEW · 90° · MediaPipe Pose', 260, 230, { size: 16, w: 700, color: COL.gray, ls: 2 });
+  X.restore();
+
+  // features panel
+  const pa = eo(seg(u, 0.2, 0.7)), x0 = 1090, y0 = 170, w0 = 700, h0 = 760;
+  X.save(); X.globalAlpha = pa; X.translate((1 - pa) * 60, 0);
+  panel(x0, y0, w0, h0, 1, 'FEATURE EXTRACTION', '33 landmarks → movement features');
+  let minK = 180, maxL = 0, reps = 0;
+  for (let s = 0; s <= u; s += 1 / 30) { const g = featuresAt(s); minK = Math.min(minK, g.knee); maxL = Math.max(maxL, g.lean); }
+  reps = Math.floor((u / PERIOD) + 0.25 - 0.5 + 0.5);
+  reps = Math.max(0, Math.floor((u + PERIOD * 0.25) / PERIOD));
+  const rows = [['knee_angle', `${Math.round(f.knee)}°`], ['torso_lean', `${Math.round(f.lean)}°`],
+    ['hip_below_knee', f.knee < 95 ? 'true' : 'false'], ['rep_count', `${reps}`], ['tempo_down', '1.1 s']];
+  rows.forEach(([k, v], i) => { const y = y0 + 130 + i * 44;
+    text(k, x0 + 28, y, { size: 18, color: COL.gray }); text(v, x0 + w0 - 28, y, { size: 18, w: 700, align: 'right', color: COL.white }); });
+  // knee-angle trace
+  const gx = x0 + 28, gyT = y0 + 370, gw = w0 - 56, gh = 150, span = Math.max(5.0, D);
+  X.strokeStyle = 'rgba(255,255,255,0.1)'; X.strokeRect(gx, gyT, gw, gh);
+  const yOf = a => gyT + gh - (a - 80) / (185 - 80) * gh;
+  X.setLineDash([5, 6]); X.strokeStyle = COL.red; X.lineWidth = 1.5; X.beginPath(); X.moveTo(gx, yOf(100)); X.lineTo(gx + gw, yOf(100)); X.stroke(); X.setLineDash([]);
+  text('target ≤ 100°', gx + gw - 6, yOf(100) + 20, { size: 12, align: 'right', color: COL.red });
+  X.strokeStyle = COL.lime; X.lineWidth = 2.5; X.shadowColor = COL.lime; X.shadowBlur = 8; X.beginPath();
+  for (let s = 0; s <= u; s += 1 / 30) { const x = gx + s / span * gw, y = yOf(featuresAt(s).knee); s === 0 ? X.moveTo(x, y) : X.lineTo(x, y); }
+  X.stroke(); X.shadowBlur = 0;
+  text('KNEE ANGLE · TRACE', gx, gyT - 12, { size: 13, w: 700, color: COL.dim, ls: 2 });
+  // checks
+  const c1 = seg(u, PERIOD * 0.75, PERIOD * 0.75 + 0.3), c2 = seg(u, PERIOD * 0.75 + 0.4, PERIOD * 0.75 + 0.7);
+  [[c1, `knee_angle_min  ${Math.round(minK)}° > 100°`, 'DEPTH'], [c2, `torso_lean_max  ${Math.round(maxL)}° > 45°`, 'CHEST']].forEach(([a, l, tag], i) => {
+    if (a <= 0) return; const y = y0 + 590 + i * 58;
+    X.save(); X.globalAlpha *= a;
+    rrect(x0 + 28, y - 30, w0 - 56, 44, 6); X.fillStyle = 'rgba(255,107,94,0.10)'; X.fill(); X.strokeStyle = 'rgba(255,107,94,0.5)'; X.stroke();
+    text('✕ ' + l, x0 + 44, y, { size: 17, w: 500, color: COL.white }); text(tag, x0 + w0 - 44, y, { size: 15, w: 700, align: 'right', color: COL.red, ls: 2 });
+    X.restore();
+  });
+  X.restore();
+}
+
+function codeBlock(lines, x, y, p, lh = 34, size = 19) {
+  const total = lines.join('').length; let budget = Math.floor(total * clamp(p));
+  lines.forEach((ln, i) => {
+    if (budget <= 0) return; const s = ln.slice(0, budget); budget -= ln.length;
+    const m = s.match(/^(\s*)("[^"]+")(:)?(.*)$/);
+    if (m && m[3]) { text(m[1] + m[2], x, y + i * lh, { size, color: '#B9C2CF' });
+      const wk = measure(m[1] + m[2] + ':', size); text(':', x + measure(m[1] + m[2], size), y + i * lh, { size, color: COL.gray });
+      text(m[4], x + wk, y + i * lh, { size, color: COL.lime }); }
+    else text(s, x, y + i * lh, { size, color: s.trim().startsWith('"') ? COL.lime : COL.gray });
+  });
+}
+function sceneCoach(u, D) {
+  const co = TL.coach, cu = u - co.offset;
+  // features card
+  const a1 = eo(seg(u, 0, 0.5));
+  X.save(); X.globalAlpha = a1; X.translate((a1 - 1) * 60, 0);
+  panel(90, 200, 520, 420, 1, 'FEATURES', 'squat · side_90');
+  codeBlock(['{', '  "exercise": "squat",', '  "reps": 2,', `  "knee_angle_min": ${STATS.knee},`, `  "torso_lean_max": ${STATS.lean},`, '  "flags": ["depth","chest"]', '}'], 120, 320, 1, 36, 19);
+  X.restore();
+  // LLM node
+  const nx = 960, ny = 410, na = eo(seg(u, 0.2, 0.7));
+  X.save(); X.globalAlpha = na;
+  for (let i = 0; i < 46; i++) {
+    const ph = ((u * 0.9 + i / 46) % 1), inL = i % 2 === 0;
+    const sx = inL ? 610 : nx + 80, ex = inL ? nx - 80 : 1310;
+    const show = inL ? u < co.offset + 1 : u > 1.0;
+    if (!show) continue;
+    const x = lerp(sx, ex, ph), y = ny + Math.sin(ph * Math.PI * 2 + i) * 22 * Math.sin(ph * Math.PI);
+    X.fillStyle = `rgba(200,240,60,${Math.sin(ph * Math.PI) * 0.9})`; X.beginPath(); X.arc(x, y, 3, 0, 7); X.fill();
+  }
+  const g = X.createRadialGradient(nx, ny, 10, nx, ny, 170); g.addColorStop(0, 'rgba(200,240,60,0.35)'); g.addColorStop(1, 'rgba(200,240,60,0)');
+  X.fillStyle = g; X.beginPath(); X.arc(nx, ny, 170, 0, 7); X.fill();
+  for (let r = 0; r < 3; r++) {
+    X.save(); X.translate(nx, ny); X.rotate(u * (0.8 + r * 0.5) * (r % 2 ? -1 : 1) + r);
+    X.strokeStyle = r === 0 ? COL.lime : 'rgba(244,245,247,0.35)'; X.lineWidth = r === 0 ? 4 : 2;
+    X.beginPath(); X.arc(0, 0, 70 + r * 22, 0, Math.PI * (1.1 + r * 0.25)); X.stroke();
+    X.fillStyle = COL.lime; X.beginPath(); X.arc(70 + r * 22, 0, 5, 0, 7); X.fill(); X.restore();
+  }
+  X.fillStyle = COL.bg; X.beginPath(); X.arc(nx, ny, 54, 0, 7); X.fill(); X.strokeStyle = COL.white; X.lineWidth = 2; X.stroke();
+  text('LLM', nx, ny + 9, { size: 26, w: 800, fam: SANS, align: 'center', ls: 2 });
+  text('structured output', nx, ny + 170, { size: 15, align: 'center', color: COL.gray, ls: 2 });
+  X.restore();
+  // feedback card
+  const a3 = eo(seg(u, 0.9, 1.4));
+  X.save(); X.globalAlpha = a3; X.translate((1 - a3) * 60, 0);
+  panel(1310, 200, 520, 420, 1, 'FEEDBACK', 'validated · approved for speech');
+  codeBlock(['{', '  "status": "assessable",', '  "cues": [', '    "Sit a little deeper",', '    "Keep your chest up"', '  ]', '}'], 1340, 320, seg(u, 1.1, co.offset + 0.2), 36, 19);
+  X.restore();
+  // voice waveform + caption
+  const va = eo(seg(u, co.offset - 0.5, co.offset));
+  X.save(); X.globalAlpha = va;
+  text('COACH VOICE · ElevenLabs', 960, 720, { size: 15, w: 700, align: 'center', color: COL.lime, ls: 3 });
+  const N = 72, bw = 10, gap = 6, x0 = 960 - (N * (bw + gap)) / 2, wy = 790;
+  const env = co.env, fi = Math.floor(cu * 30);
+  const level = env ? (fi >= 0 && fi < env.length ? env[fi] : 0) : (cu > 0 && cu < co.dur ? 0.5 + 0.4 * Math.abs(Math.sin(cu * 9)) : 0);
+  for (let i = 0; i < N; i++) {
+    const shape = Math.pow(Math.sin((i + 0.5) / N * Math.PI), 1.2);
+    const v = 4 + 90 * level * shape * (0.45 + 0.55 * Math.abs(Math.sin(i * 1.7 + u * 14)));
+    X.fillStyle = level > 0.02 ? COL.lime : 'rgba(255,255,255,0.2)';
+    X.fillRect(x0 + i * (bw + gap), wy - v / 2, bw, v);
+  }
+  const words = '"Nice control. Sit a little deeper, and keep your chest up."'.split(' ');
+  const shown = Math.ceil(words.length * clamp(cu / (co.dur * 0.75)));
+  if (cu > 0) text(words.slice(0, shown).join(' '), 960, 905, { size: 40, w: 700, fam: SANS, align: 'center' });
+  X.restore();
+}
+
+function sceneEnd(u, D) {
+  drawLogo(960, 450, 1.9, seg(u, 0, 1.3), { tagline: seg(u, 0.8, 1.8), glow: 24 });
+  const steps = 'IDENTIFY  →  POSITION  →  EXTRACT  →  COACH';
+  text(steps, 960, 780, { size: 18, w: 700, align: 'center', color: COL.lime, ls: 4, alpha: eo(seg(u, 1.4, 2.0)) });
+}
+
+const SCENES = { hook: sceneHook, brand: sceneBrand, identify: sceneIdentify, position: scenePosition, extract: sceneExtract, coach: sceneCoach, end: sceneEnd };
+const STEP_OF = { identify: 0, position: 1, extract: 2, coach: 3 };
+
+function render(t) {
+  background(t);
+  const sc = TL.scenes.find(s => t >= s.start && t < s.start + s.dur) || TL.scenes[TL.scenes.length - 1];
+  const u = t - sc.start;
+  const fin = clamp(u / 0.18), fout = sc === TL.scenes[TL.scenes.length - 1] ? 1 : clamp((sc.dur - u) / 0.14);
+  X.save(); X.globalAlpha = Math.min(fin, fout);
+  SCENES[sc.id](u, sc.dur);
+  X.restore();
+  const step = STEP_OF[sc.id];
+  hud(t, step ?? -1, step === undefined ? 0 : 1);
+  // glitch slices near scene boundaries
+  for (const s of TL.scenes) {
+    const g = 1 - Math.abs(t - s.start) / 0.14;
+    if (s.start === 0 || g <= 0) continue;
+    for (let i = 0; i < 9; i++) {
+      const y = Math.floor(rnd(i + Math.floor(t * 30) * 13) * H), h = 6 + rnd(i * 3 + 1) * 50, dx = (rnd(i * 7 + Math.floor(t * 30)) - 0.5) * 140 * g;
+      X.drawImage(C, 0, y, W, h, dx, y, W, h);
+    }
+    X.fillStyle = `rgba(200,240,60,${0.5 * g})`; X.fillRect(0, H * (1 - g), W, 2);
+  }
+  // fade from / to black
+  const edge = Math.min(seg(t, 0, 0.3), seg(TL.total - t, 0, 0.4));
+  if (edge < 1) { X.fillStyle = `rgba(0,0,0,${1 - edge})`; X.fillRect(0, 0, W, H); }
+}
+window.render = render;
+window.ready = document.fonts.load('800 100px Figtree').then(() => document.fonts.load('500 20px "JetBrains Mono"'))
+  .then(() => document.fonts.load('700 20px "JetBrains Mono"')).then(() => document.fonts.ready).then(() => true);
+if (!navigator.webdriver) {
+  const t0 = performance.now();
+  window.ready.then(() => { const loop = () => { render(((performance.now() - t0) / 1000) % TL.total); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body></html>

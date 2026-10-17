@@ -1,0 +1,6 @@
+.env
+node_modules/
+audio/
+build/
+stills/
+timeline.js
