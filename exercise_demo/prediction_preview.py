@@ -2,9 +2,12 @@
 import math
 
 NAMES={'squat':'Squat','pushup':'Push-up','push up':'Push-up','push-up':'Push-up',
-       'lateral_raise':'Lateral raise','lateral raises':'Lateral raise'}
+       'lateral_raise':'Lateral raise','lateral raise':'Lateral raise','lateral raises':'Lateral raise'}
+ALLOWED_EXERCISES={'squat','pushup','lateral_raise'}
 
 def prediction_preview(result):
+    if result.get('preview_discarded'):
+        return {'preview_label':'Unknown','preview_score':None,'preview_source':'image'}
     source=result.get('source')
     if result.get('cloud_confirmed') and source=='openai_vision':
         label=result.get('display_name') or result['exercise'].replace('_',' ').capitalize()
@@ -18,6 +21,7 @@ def prediction_preview(result):
     else:
         source='image';label=result.get('raw_label') or result.get('exercise','unknown')
         score=result.get('score')
-    label=NAMES.get(label,str(label).replace('_',' ').capitalize())
+    label=NAMES.get(str(label).lower(),'Unknown')
+    if label=='Unknown':score=None
     if type(score) not in (int,float) or not math.isfinite(score) or not 0<=score<=1:score=None
     return {'preview_label':label,'preview_score':score,'preview_source':source}

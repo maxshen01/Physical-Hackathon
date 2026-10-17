@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 from hybrid import HybridClassifier
-from prediction_preview import prediction_preview
+from prediction_preview import prediction_preview, ALLOWED_EXERCISES
 from vision_fallback import VisionFallback, settings as vision_settings
 
 lock = threading.Lock()
@@ -58,6 +58,13 @@ def predict(request: Request, file: UploadFile = File(...)):
         result = app.state.model.predict(image, session_id=key)
     # Cloud work runs in a bounded background executor, outside the ML lock.
     result.update(app.state.vision.update(key,image,local_exercise=result['exercise']))
+    if result['exercise'] not in ALLOWED_EXERCISES | {'unknown'}:
+        result['preview_discarded']=True
+        result['exercise']='unknown'
+        result.pop('display_name',None)
+        result.pop('cloud_confirmed',None)
+        if result.get('source')=='openai_vision':
+            result.update(source='unknown',cloud_status='uncertain',cloud_checks=0)
     result.update(prediction_preview(result))
     ranking = sorted(result.get('scores', {}).items(), key=lambda x: x[1], reverse=True)[:3]
     with lock:

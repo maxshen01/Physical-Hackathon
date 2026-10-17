@@ -14,6 +14,11 @@ struct RecognitionResponse: Decodable {
 }
 
 struct RecognitionHistory {
+    private static func displayName(_ value: String) -> String? {
+        let names = ["squat":"Squat", "pushup":"Push-up", "push up":"Push-up", "push-up":"Push-up",
+                     "lateral_raise":"Lateral raise", "lateral raise":"Lateral raise", "lateral raises":"Lateral raise"]
+        return names[value.lowercased()]
+    }
     private var labels: [String] = []
     private(set) var confidence: Double = 0
     private(set) var isLocked = false
@@ -32,18 +37,15 @@ struct RecognitionHistory {
     mutating func apply(_ result: RecognitionResponse) -> String {
         guard !isLocked else { return candidate }
         if result.cloud_confirmed == true, result.source == "openai_vision", result.cloud_checks == 2,
-           result.exercise.range(of: "^[a-z][a-z0-9_]{1,47}$", options: .regularExpression) != nil,
-           let name = result.display_name, name.lowercased() != "unknown",
-           name.range(of: "^[A-Za-z][A-Za-z0-9 '-]{1,47}$", options: .regularExpression) != nil {
+           let name = Self.displayName(result.exercise),
+           let supplied = result.display_name.flatMap(Self.displayName), supplied == name {
             candidate = name; cloudConfirmed = true; confidence = 1; isLocked = true
             previewLabel = name; previewScore = nil; previewSource = "openai_vision"
             return candidate
         }
         let accepted = update(result.exercise)
-        let validName = result.preview_label.flatMap { name in
-            name.range(of: "^[A-Za-z][A-Za-z0-9 '-]{1,63}$", options: .regularExpression) != nil ? name : nil
-        }
-        previewLabel = isLocked ? candidate : (validName ?? accepted)
+        let validName = result.preview_label.flatMap(Self.displayName)
+        previewLabel = isLocked ? candidate : (result.preview_label == nil ? accepted : (validName ?? "Unknown"))
         previewSource = ["image", "person_crop", "movement"].contains(result.preview_source ?? "") ? result.preview_source : nil
         if let score = result.preview_score, score.isFinite, (0...1).contains(score),
            previewSource == "image" || previewSource == "person_crop",
@@ -54,8 +56,7 @@ struct RecognitionHistory {
     }
     mutating func update(_ value: String) -> String {
         guard !isLocked else { return candidate }
-        let names = ["squat": "Squat", "pushup": "Push-up", "push-up": "Push-up", "lateral_raise": "Lateral raise", "unknown": "Unknown"]
-        let current = names[value] ?? "Unknown"
+        let current = Self.displayName(value) ?? "Unknown"
         labels.append(current)
         labels = Array(labels.suffix(10))
         let counts = Dictionary(grouping: labels.filter { $0 != "Unknown" }, by: { $0 }).mapValues(\.count)

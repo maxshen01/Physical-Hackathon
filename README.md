@@ -5,7 +5,7 @@ Exercise-recognition prototype with a native iPhone camera app and a Python back
 - Image classification across 22 workout classes, with Squat, Push-up and Lateral raise accepted by the local app.
 - Pose-based movement recognition and a person-crop retry for uncertain images.
 - Live leading-label/model-confidence display, with a separate session-agreement lock.
-- Optional GPT-5.4 nano vision fallback after 20 unresolved seconds; two fresh-sequence checks must agree before locking an unfamiliar exercise.
+- Optional GPT-5.4 nano vision fallback after 20 unresolved seconds; two fresh-sequence checks must agree before locking one of the three supported exercises. All other exercises return Unknown.
 - Re-classify starts a fresh session. Camera frames are not saved; the optional cloud fallback sends selected in-memory frames to OpenAI.
 
 ## Start here

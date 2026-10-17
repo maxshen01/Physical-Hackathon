@@ -6,8 +6,11 @@ class PreviewTests(unittest.TestCase):
     def test_rejected_top_class_remains_visible_without_changing_decision(self):
         result={'exercise':'unknown','source':'unknown','raw_label':'shoulder press','score':.42}
         p=prediction_preview(result)
-        self.assertEqual(p,{'preview_label':'Shoulder press','preview_score':.42,'preview_source':'image'})
+        self.assertEqual(p,{'preview_label':'Unknown','preview_score':None,'preview_source':'image'})
         self.assertEqual(result['exercise'],'unknown')
+    def test_allowed_low_score_preview_is_still_visible(self):
+        p=prediction_preview({'exercise':'unknown','source':'unknown','raw_label':'squat','score':.42})
+        self.assertEqual(p['preview_label'],'Squat');self.assertEqual(p['preview_score'],.42)
     def test_movement_does_not_inherit_unrelated_image_probability(self):
         p=prediction_preview({'exercise':'squat','source':'movement','raw_label':'deadlift','score':.98})
         self.assertEqual(p['preview_label'],'Squat');self.assertIsNone(p['preview_score'])
@@ -19,5 +22,5 @@ class PreviewTests(unittest.TestCase):
             self.assertIsNone(prediction_preview({'exercise':'unknown','score':score})['preview_score'])
     def test_cloud_confirmation_has_no_fabricated_probability(self):
         p=prediction_preview({'exercise':'lunge','source':'openai_vision','cloud_confirmed':True,'display_name':'Lunge','score':.99})
-        self.assertEqual(p['preview_label'],'Lunge');self.assertIsNone(p['preview_score'])
+        self.assertEqual(p['preview_label'],'Unknown');self.assertIsNone(p['preview_score'])
 if __name__=='__main__':unittest.main()

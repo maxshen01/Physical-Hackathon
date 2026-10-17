@@ -17,7 +17,7 @@ EXERCISE_OPENAI_MAX_CALLS=30
 - The local image/pose pipeline runs first. A label that reaches 90% agreement locally locks as before, with no paid request.
 - If the session is still unresolved after 20 seconds, a background worker sends six recent frames to the OpenAI Responses API. Images are reduced to at most 512 pixels on their longest edge. Only one frame per approximately second is buffered.
 - A clear exercise result gets a second check only after six fresh frames have arrived. The two sets do not overlap. At most two requests are made per camera session.
-- Two matching clear results, both reporting visible exercise motion, produce an AI-confirmed name. The native app can display exercises outside Squat, Push-up and Lateral raise, such as Lunge or Biceps curl. The UI shows **AI cross-check 2/2**, turns green and locks until Re-classify/Stop.
+- Two matching clear results, both reporting visible exercise motion, produce an AI-confirmed name. Only Squat, Push-up and Lateral raise are supported. Every other exercise returns Unknown and is excluded from previews and locking. The UI shows **AI cross-check 2/2**, turns green and locks until Re-classify/Stop.
 - The AI result is not counted as nine independent local predictions. No model self-reported confidence is used or presented as measured accuracy.
 - If the result is uncertain, static, ordinary walking/standing, an API refusal/error, or the checks disagree, the AI path does not lock a name. Local classification continues. Tap Re-classify for another attempt.
 - A camera restart/Re-classify creates a new session ID. A late response from the old session cannot affect the new session.

@@ -29,3 +29,7 @@ The key stays on the Mac. Selected frames go to OpenAI only when configured. See
 ## Live preview before locking
 
 For session-aware clients, each response also contains `preview_label`, `preview_score` (0–1, or null), and `preview_source`. Rejected full-frame top-1 predictions remain visible across all 22 image-model classes without changing `exercise` or counting toward locking. An accepted crop supplies its own score. Movement and AI-confirmed labels have no fabricated image probability. The native screen shows MOST LIKELY and live model confidence per response (at most about 2 Hz), separately from session agreement. The label and score freeze at lock and reset on Re-classify/Stop. These are model scores, not measured correctness.
+
+## Current vocabulary restriction
+
+The latest demo accepts and displays only Squat, Push-up, Lateral raise, or Unknown. This supersedes earlier open-vocabulary preview and cloud-fallback descriptions above. Other raw image classes still compete internally, but their names and confidence are discarded from the app preview. Other cloud exercise names are rejected by the request schema, backend validation and native display/lock validation. No renormalisation or forced nearest-target choice is used.

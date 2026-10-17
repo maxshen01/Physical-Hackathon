@@ -38,16 +38,17 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'exercise': 'squat'})
 
-    def test_unmapped_cloud_response_reaches_the_app(self):
+    def test_unmapped_cloud_response_is_discarded(self):
         from fastapi.testclient import TestClient
         data = io.BytesIO(); Image.new('RGB', (32,48),'white').save(data,format='JPEG')
         with TestClient(self.app) as client:
             with patch.object(self.app.state.vision,'update',return_value={'exercise':'lunge','display_name':'Lunge','source':'openai_vision','cloud_confirmed':True,'cloud_checks':2,'cloud_status':'confirmed'}):
                 response=client.post('/predict',headers={'X-Movement-Session':'unit-session'},files={'file':('frame.jpg',data.getvalue(),'image/jpeg')})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(response.json()['exercise'],'lunge')
-        self.assertEqual(response.json()['display_name'],'Lunge')
-        self.assertTrue(response.json()['cloud_confirmed'])
+        self.assertEqual(response.json()['exercise'],'unknown')
+        self.assertNotIn('display_name',response.json())
+        self.assertNotIn('cloud_confirmed',response.json())
+        self.assertEqual(response.json()['preview_label'],'Unknown')
 
     def test_live_preview_includes_rejected_leader(self):
         from fastapi.testclient import TestClient
@@ -56,8 +57,8 @@ class ServerTests(unittest.TestCase):
             with patch.object(self.app.state.model,'predict',return_value={'exercise':'unknown','raw_label':'shoulder press','score':.42}), patch.object(self.app.state.vision,'update',return_value={'cloud_status':'disabled'}):
                 response=client.post('/predict',headers={'X-Movement-Session':'preview-test'},files={'file':('frame.jpg',data.getvalue(),'image/jpeg')})
         self.assertEqual(response.json()['exercise'],'unknown')
-        self.assertEqual(response.json()['preview_label'],'Shoulder press')
-        self.assertEqual(response.json()['preview_score'],.42)
+        self.assertEqual(response.json()['preview_label'],'Unknown')
+        self.assertIsNone(response.json()['preview_score'])
 
     def test_invalid_image_is_rejected(self):
         from fastapi.testclient import TestClient

@@ -41,7 +41,7 @@ struct ContentView: View {
                 } else if camera.evidenceSource == "movement" {
                     Text("Movement pattern confirmed").font(.subheadline).foregroundStyle(.secondary)
                 } else if !camera.cloudConfirmed {
-                    Text(camera.running ? "Waiting for a model reading…" : "Live confidence appears when classification starts.")
+                    Text(camera.running ? (camera.evidenceSource == nil ? "Waiting for a model reading…" : "No supported exercise detected.") : "Live confidence appears when classification starts.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }

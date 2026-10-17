@@ -73,4 +73,4 @@ A future simulator can supply its rendered RGB array directly to `ExerciseClassi
 
 ## Optional OpenAI fallback after 20 seconds
 
-The native app can use a bounded OpenAI vision cross-check for unresolved sessions and exercises beyond the original three. Put the key in the workspace's ignored `.env.local`; see [OPENAI_FALLBACK.md](OPENAI_FALLBACK.md). This path sends selected in-memory frames to OpenAI when configured, uses at most two calls per session, and requires two matching fresh-sequence results before the app locks a new name. Its live recognition quality remains to be evaluated with your key.
+The native app can use a bounded OpenAI vision cross-check for unresolved sessions for the same three supported exercises. Put the key in the workspace's ignored `.env.local`; see [OPENAI_FALLBACK.md](OPENAI_FALLBACK.md). This path sends selected in-memory frames to OpenAI when configured, uses at most two calls per session, and requires two matching fresh-sequence results before the app locks a supported name. Its live recognition quality remains to be evaluated with your key.

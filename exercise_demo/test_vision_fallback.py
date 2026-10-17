@@ -14,7 +14,7 @@ class Deferred:
     def shutdown(self,**kw):self.jobs=[]
 
 class CloudTests(unittest.TestCase):
-    def setup_model(self,labels=('lunge','lunge'),max_calls=30,enabled=True):
+    def setup_model(self,labels=('squat','squat'),max_calls=30,enabled=True):
         self.t=0;self.executor=Deferred();self.requests=[];labels=iter(labels)
         def request(config,frames):self.requests.append(tuple(frames));return next(labels)
         self.model=VisionFallback(lambda:Settings('fake-key',enabled,max_calls=max_calls),request,lambda:self.t,self.executor)
@@ -34,7 +34,7 @@ class CloudTests(unittest.TestCase):
         self.assertEqual(self.frame(26)['cloud_status'],'checking_again')
         self.assertGreater(self.model.sessions['session'].frames[0][0],first)
         self.executor.run();result=self.frame(27)
-        self.assertEqual(result['exercise'],'lunge');self.assertEqual(result['display_name'],'Lunge')
+        self.assertEqual(result['exercise'],'squat');self.assertEqual(result['display_name'],'Squat')
         self.assertTrue(result['cloud_confirmed']);self.assertEqual(result['cloud_checks'],2)
         self.assertEqual(len(self.requests),2)
         for t in range(28,100):self.frame(t)
@@ -56,7 +56,7 @@ class CloudTests(unittest.TestCase):
         self.assertNotIn('cloud_confirmed',r);self.assertEqual(r['cloud_status'],'uncertain')
         self.assertEqual(self.model.calls,1)
     def test_disagreement_never_confirms(self):
-        self.setup_model(labels=('lunge','biceps_curl'))
+        self.setup_model(labels=('squat','pushup'))
         for t in range(21):self.frame(t)
         self.executor.run()
         for t in range(21,27):self.frame(t)
@@ -85,7 +85,7 @@ class CloudTests(unittest.TestCase):
         self.executor.run();self.assertNotIn('a',self.model.sessions)
         self.assertLessEqual(len(self.model.sessions),8)
     def test_safe_unmapped_names(self):
-        self.assertEqual(canonical_exercise('Bulgarian split squat'),'bulgarian_split_squat')
+        self.assertIsNone(canonical_exercise('Bulgarian split squat'))
         self.assertEqual(canonical_exercise('push-ups'),'pushup')
         for value in ['unknown','standing','<script>alert(1)</script>','x'*100]:self.assertIsNone(canonical_exercise(value))
     def test_openai_payload_and_response(self):
@@ -93,7 +93,7 @@ class CloudTests(unittest.TestCase):
         with patch('vision_fallback.requests.post') as post:
             post.return_value.status_code=200;post.return_value.json.return_value=response
             label=request_vision(Settings('secret',True),[b'jpeg']*6)
-            self.assertEqual(label,'biceps_curl');payload=post.call_args.kwargs['json']
+            self.assertIsNone(label);payload=post.call_args.kwargs['json']
             self.assertFalse(payload['store']);self.assertEqual(payload['model'],'gpt-5.4-nano')
             self.assertEqual(len(payload['input'][0]['content']),7)
             self.assertTrue(payload['text']['format']['strict'])
