@@ -111,5 +111,6 @@ def approved_feedback(feedback: Feedback) -> Feedback:
     else:
         speech = "Based on these measurements, try this. " + feedback.cues[0].rstrip(" .") + "."
         if len(feedback.cues) == 2:
-            speech += " Also, " + feedback.cues[1].rstrip(" .") + "."
+            second = feedback.cues[1].rstrip(" .")
+            speech += " Also, " + second[:1].lower() + second[1:] + "."
     return Feedback.model_validate({**feedback.model_dump(), "spoken_text": speech})

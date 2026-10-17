@@ -25,7 +25,7 @@ class Settings:
     key: str = field(default='',repr=False)
     enabled: bool = False
     model: str = 'gpt-5.4-nano'
-    after_seconds: float = 20
+    after_seconds: float = 8
     max_calls: int = 30
 
 def settings():
@@ -33,8 +33,8 @@ def settings():
     def get(name,default=''):return os.getenv(name) or values.get(name) or default
     key=get('OPENAI_API_KEY').strip()
     enabled=get('EXERCISE_OPENAI_FALLBACK_ENABLED','true').lower() in ('1','true','yes')
-    try:after=max(20,float(get('EXERCISE_OPENAI_AFTER_SECONDS','20')))
-    except ValueError:after=20
+    try:after=max(5,float(get('EXERCISE_OPENAI_AFTER_SECONDS','8')))
+    except ValueError:after=8
     try:limit=max(0,min(100,int(get('EXERCISE_OPENAI_MAX_CALLS','30'))))
     except ValueError:limit=30
     return Settings(key,enabled and bool(key),get('EXERCISE_OPENAI_MODEL','gpt-5.4-nano'),after,limit)
@@ -97,6 +97,8 @@ def request_vision(config,frames):
     except (requests.RequestException,ValueError,KeyError,TypeError):
         raise VisionError('api_unavailable') from None
 
+LOCAL_LOCK_VOTES = 3
+
 @dataclass
 class Session:
     started: float
@@ -110,7 +112,8 @@ class Session:
     confirmed: str | None = None
     status: str = 'waiting'
     error: str | None = None
-    local_votes: deque = field(default_factory=lambda:deque(maxlen=10),repr=False)
+    # Mirrors the app's lock: LOCAL_LOCK_VOTES consecutive agreeing readings.
+    local_votes: deque = field(default_factory=lambda:deque(maxlen=LOCAL_LOCK_VOTES),repr=False)
     locally_resolved: bool = False
 
 class VisionFallback:
@@ -131,7 +134,7 @@ class VisionFallback:
             while len(self.sessions)>8:self.sessions.popitem(last=False)
             if state.confirmed or state.locally_resolved:return self.result(state)
             state.local_votes.append(local_exercise)
-            if local_exercise in ('squat','pushup','lateral_raise') and len(state.local_votes)==10 and state.local_votes.count(local_exercise)>=9:
+            if local_exercise in ('squat','pushup','lateral_raise') and len(state.local_votes)==LOCAL_LOCK_VOTES and state.local_votes.count(local_exercise)==LOCAL_LOCK_VOTES:
                 state.locally_resolved=True;state.status='local_confirmed';state.frames.clear()
                 return self.result(state)
             if now-state.last_frame>=.9 and state.attempts<2:

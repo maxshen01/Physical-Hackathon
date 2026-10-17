@@ -21,7 +21,7 @@ Alternatively, use the installed `kinevoa-classifier` command or `uvicorn kinevo
 - `web/`: bundled browser client and required app icons.
 - `tools/`, `tests/`, `notebooks/`, `results/`: development tools, checks and historical evaluation evidence; not imported by the runtime package.
 
-The only accepted exercises are `squat`, `pushup`, `lateral_raise`, and `unknown`. Other raw classes still compete internally, but are discarded for display and acceptance. The image acceptance rule requires top-1 score ≥0.65 and margin ≥0.15. Temporal fallback requires a session ID. Optional cloud checks require two agreeing fresh frame sequences after 20 unresolved seconds.
+The only accepted exercises are `squat`, `pushup`, `lateral_raise`, and `unknown`. Other raw classes still compete internally, but are discarded for display and acceptance. The image acceptance rule requires top-1 score ≥0.65 and margin ≥0.15. Temporal fallback requires a session ID. Optional cloud checks require two agreeing fresh frame sequences after 8 unresolved seconds (`EXERCISE_OPENAI_AFTER_SECONDS`, minimum 5).
 
 ## Runtime configuration
 

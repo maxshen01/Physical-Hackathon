@@ -21,23 +21,23 @@ class CloudTests(unittest.TestCase):
         self.image=Image.new('RGB',(80,160),'white')
     def frame(self,t,key='session'):
         self.t=t;return self.model.update(key,self.image)
-    def test_trigger_after_twenty_and_require_disjoint_fresh_frames(self):
+    def test_trigger_after_eight_and_require_disjoint_fresh_frames(self):
         self.setup_model()
-        for t in range(20):self.frame(t)
+        for t in range(8):self.frame(t)
         self.assertEqual(len(self.executor.jobs),0)
-        self.assertEqual(self.frame(20)['cloud_status'],'checking')
+        self.assertEqual(self.frame(8)['cloud_status'],'checking')
         self.executor.run()
         first=self.model.sessions['session'].last_cutoff
-        self.assertEqual(self.frame(21)['cloud_status'],'awaiting_fresh_frames')
-        for t in range(22,26):self.frame(t)
+        self.assertEqual(self.frame(9)['cloud_status'],'awaiting_fresh_frames')
+        for t in range(10,14):self.frame(t)
         self.assertEqual(len(self.executor.jobs),0)
-        self.assertEqual(self.frame(26)['cloud_status'],'checking_again')
+        self.assertEqual(self.frame(14)['cloud_status'],'checking_again')
         self.assertGreater(self.model.sessions['session'].frames[0][0],first)
-        self.executor.run();result=self.frame(27)
+        self.executor.run();result=self.frame(15)
         self.assertEqual(result['exercise'],'squat');self.assertEqual(result['display_name'],'Squat')
         self.assertTrue(result['cloud_confirmed']);self.assertEqual(result['cloud_checks'],2)
         self.assertEqual(len(self.requests),2)
-        for t in range(28,100):self.frame(t)
+        for t in range(16,100):self.frame(t)
         self.assertEqual(len(self.requests),2)
     def test_locally_resolved_session_never_uses_paid_fallback(self):
         self.setup_model()

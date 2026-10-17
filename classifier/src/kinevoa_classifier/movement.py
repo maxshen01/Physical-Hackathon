@@ -140,6 +140,9 @@ class Cycle:
         return False
 
 
+MAX_GAP_SECONDS = 3.0
+
+
 class MovementRecognizer:
     def __init__(self):self.reset()
     def reset(self):
@@ -152,7 +155,9 @@ class MovementRecognizer:
             # Never display a stale label without visible pose. Preserve an incomplete
             # cycle across a single missed sample; the next timestamp enforces expiry.
             return dict(self.result(), exercise='unknown', reason='pose_missing_or_multiple_people')
-        if self.previous is not None and (f.time <= self.previous.time or f.time-self.previous.time > 1.6):
+        # Pose often drops for ~2 s at the bottom of a deep squat; tolerate that
+        # dropout but still expire cycles after a longer gap.
+        if self.previous is not None and (f.time <= self.previous.time or f.time-self.previous.time > MAX_GAP_SECONDS):
             self.reset()
         dt=f.time-self.previous.time if self.previous else .5
         # Sudden camera/person translation or scale change invalidates the cycle.

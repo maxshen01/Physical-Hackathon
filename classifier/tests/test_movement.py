@@ -24,12 +24,19 @@ class MovementTests(unittest.TestCase):
         self.assertEqual(result['exercise'],'unknown')
     def test_missing_pose_and_gap_break_cycles(self):
         rec=MovementRecognizer()
-        for i,k in enumerate([175,175,160,110]):rec.update(feature(i*.5,k))
+        for i,k in enumerate([175,175,160,110]):rec.update(feature(i*.5,k,hip=.4+(175-k)/600))
         rec.update(None)
-        self.assertEqual(rec.update(feature(4,175))['exercise'],'unknown')
+        self.assertEqual(rec.update(feature(5,175))['exercise'],'unknown')
         rec=MovementRecognizer()
         for i,k in enumerate([175,175,160,110]):rec.update(feature(i*.5,k))
         self.assertEqual(rec.update(feature(5,175))['exercise'],'unknown')
+    def test_squat_survives_pose_dropout_at_bottom(self):
+        # Real squat clips lose the pose for ~2.5 s at full depth.
+        rec=MovementRecognizer()
+        for i,k in enumerate([175,175,150,110,95]):rec.update(feature(i*.5,k,hip=.4+(175-k)/600))
+        for _ in range(5):self.assertEqual(rec.update(None)['exercise'],'unknown')
+        for t,k in [(4.5,110),(5,145),(5.5,170),(6,175)]:result=rec.update(feature(t,k,hip=.4+(175-k)/600))
+        self.assertEqual(result['exercise'],'squat')
     def test_camera_translation_does_not_complete_squat(self):
         rec=MovementRecognizer()
         for i,k in enumerate([175,175,150,100]):rec.update(feature(i*.25,k))
