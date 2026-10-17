@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/5b947053-22d1-4c83-b490-be70e1d47517
+
 # Orbit
 
 An iPhone demo with one guided flow:
@@ -13,6 +17,10 @@ The live camera is used for recognition and placement; no video recording is sav
 [Watch the demo video](video/WhatsApp%20Video%202026-10-17%20at%2015.53.57.mp4)
 
 ## Start the demo
+
+
+https://github.com/user-attachments/assets/15aa974f-add0-4d9f-8bfb-19875ae08429
+
 
 Use Python 3.11 and Xcode 26 (iOS 17+):
 
