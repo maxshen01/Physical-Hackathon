@@ -5,9 +5,8 @@ struct ContentView: View {
     private let signal = Color(red: 0.79, green: 0.98, blue: 0.10)
     private let panel = Color(red: 0.12, green: 0.14, blue: 0.17)
     @StateObject private var camera = CameraModel()
-    @AppStorage("backendAddress") private var address = ""
-    @AppStorage("feedbackAddress") private var feedbackAddress = ""
-    @State private var settings = false
+    /// Combined demo server on this Mac (Personal Hotspot address).
+    private let address = "https://172.20.10.3:8443"
     @State private var heightText = "170"
     @State private var setupMarker: FloorMarker = .bottom
     @State private var facingOverride: FloorMarker?
@@ -39,9 +38,6 @@ struct ContentView: View {
                     Image("OrbitLogo").resizable().scaledToFit().frame(width: 140, height: 48)
                         .accessibilityLabel("Orbit")
                     Spacer()
-                    Button { settings = true } label: { Image(systemName: "gearshape").padding(12) }
-                        .accessibilityLabel("Connection settings")
-                        .disabled(camera.running)
                 }
                 HStack(spacing: 8) {
                     ForEach(Array(["Recognise", "Position", "Capture", "Listen"].enumerated()), id: \.offset) { index, name in
@@ -159,31 +155,10 @@ struct ContentView: View {
         .onChange(of: setupMarker) { _, _ in updatePlacement() }
         .onChange(of: facingOverride) { _, _ in updatePlacement() }
         .onChange(of: scenePhase) { _, phase in if phase != .active { camera.stop() } }
-        .sheet(isPresented: $settings) {
-            NavigationStack {
-                Form {
-                    Section("Demo server") {
-                        TextField("https://192.168.1.42:8443", text: $address)
-                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
-                        Text("Use the laptop’s HTTPS address on the same Wi-Fi. The combined server handles recognition, image features and voice feedback.")
-                    }
-                    Section("Separate feedback server (optional)") {
-                        TextField("Leave blank to use the demo server", text: $feedbackAddress)
-                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
-                        Text("Use a publicly trusted HTTPS address for a separately hosted feedback service.")
-                    }
-                    Section("Before you start") {
-                        Text("Camera frames go to the demo server for recognition. If configured, its AI fallback sends selected frames to OpenAI. After capture, only the extracted measurements go to the feedback model, and approved words go to ElevenLabs. No media history is kept by this app. Provider retention depends on account settings.")
-                    }
-                }.navigationTitle("Connection")
-                    .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { settings = false } } }
-            }.preferredColorScheme(.dark)
-        }
         .sheet(item: $camera.reviewInput, onDismiss: {
             camera.clearCapture()
         }) { input in
-            FeedbackReviewView(input: input, baseAddress: feedbackAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? address : feedbackAddress,
-                               usesDemoTrust: feedbackAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            FeedbackReviewView(input: input, baseAddress: address, usesDemoTrust: true)
         }
     }
 
@@ -200,8 +175,7 @@ struct ContentView: View {
         switch camera.step {
         case .recognise:
             guard !camera.running else { return }
-            if address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { settings = true }
-            else { updatePlacement(); camera.start(address: address) }
+            updatePlacement(); camera.start(address: address)
         case .position: camera.lockPlacement()
         case .capture, .review: camera.captureImage()
         case .processing: break

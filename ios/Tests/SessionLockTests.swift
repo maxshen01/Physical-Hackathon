@@ -3,31 +3,35 @@ import Foundation
 @main struct SessionLockTests {
     static func main() {
         var state = RecognitionHistory()
-        for _ in 0..<8 { _ = state.update("squat") }
-        precondition(!state.isLocked && abs(state.confidence - 0.8) < 0.001)
+        precondition(RecognitionHistory.lockWindow == 3)
+        for _ in 0..<2 { _ = state.update("squat") }
+        precondition(!state.isLocked && abs(state.confidence - 2.0 / 3) < 0.001)
         _ = state.update("unknown")
         precondition(!state.isLocked)
+        _ = state.update("squat")
+        precondition(!state.isLocked, "Lock needs every reading in the window to agree")
+        _ = state.update("squat")
         precondition(state.update("squat") == "Squat")
-        precondition(state.isLocked && abs(state.confidence - 0.9) < 0.001)
+        precondition(state.isLocked && state.confidence == 1)
         for value in ["unknown", "pushup", "lateral_raise", "bad-label"] {
             precondition(state.update(value) == "Squat")
-            precondition(state.isLocked && abs(state.confidence - 0.9) < 0.001)
+            precondition(state.isLocked && state.confidence == 1)
         }
         state.reset()
         precondition(!state.isLocked && state.confidence == 0 && state.candidate == "Unknown")
         for _ in 0..<10 { _ = state.update("unknown") }
         precondition(!state.isLocked && state.confidence == 0)
-        for _ in 0..<10 { _ = state.update("pushup") }
+        for _ in 0..<3 { _ = state.update("pushup") }
         precondition(state.isLocked && state.candidate == "Push-up")
         state.reset()
-        for _ in 0..<8 { _ = state.update("squat") }
-        _ = state.update("pushup"); _ = state.update("unknown")
-        precondition(!state.isLocked && abs(state.confidence - 0.8) < 0.001)
+        for _ in 0..<2 { _ = state.update("squat") }
+        _ = state.update("pushup")
+        precondition(!state.isLocked && abs(state.confidence - 2.0 / 3) < 0.001)
         state.reset()
-        for _ in 0..<9 { _ = state.update("squat") }
+        for _ in 0..<2 { _ = state.update("squat") }
         _ = state.update("unknown")
         precondition(!state.isLocked, "Never lock an old majority on a current Unknown response")
-        _ = state.update("squat")
+        for _ in 0..<3 { _ = state.update("squat") }
         precondition(state.isLocked)
         state.reset()
         let decoder = JSONDecoder()
@@ -53,12 +57,12 @@ import Foundation
         _ = state.apply(nextFrame)
         precondition(state.previewLabel == "Squat" && state.previewScore == 0.58, "Preview must update on every response")
         let acceptedFrame = try! decoder.decode(RecognitionResponse.self, from: Data(#"{"exercise":"squat","preview_label":"Squat","preview_score":0.87,"preview_source":"image"}"#.utf8))
-        for _ in 0..<10 { _ = state.apply(acceptedFrame) }
+        for _ in 0..<3 { _ = state.apply(acceptedFrame) }
         precondition(state.isLocked && state.previewScore == 0.87)
         _ = state.apply(provisional)
         precondition(state.previewLabel == "Squat" && state.previewScore == 0.87, "Preview freezes at lock")
         state.reset()
         precondition(state.previewLabel == "Unknown" && state.previewScore == nil)
-        print("Session lock tests passed: 90% gate, Unknown rejection, fixed label, reset, new exercise")
+        print("Session lock tests passed: 3-reading gate, Unknown rejection, fixed label, reset, new exercise")
     }
 }

@@ -19,6 +19,8 @@ struct RecognitionHistory {
                      "lateral_raise":"Lateral raise", "lateral raise":"Lateral raise", "lateral raises":"Lateral raise"]
         return names[value.lowercased()]
     }
+    /// Readings that must all agree before the exercise label locks.
+    static let lockWindow = 3
     private var labels: [String] = []
     private(set) var confidence: Double = 0
     private(set) var isLocked = false
@@ -28,7 +30,7 @@ struct RecognitionHistory {
     private(set) var previewScore: Double?
     private(set) var previewSource: String?
     var sampleCount: Int { labels.count }
-    var agreeingCount: Int { cloudConfirmed ? 2 : Int((confidence * 10).rounded()) }
+    var agreeingCount: Int { cloudConfirmed ? 2 : Int((confidence * Double(Self.lockWindow)).rounded()) }
 
     mutating func reset() {
         labels = []; confidence = 0; isLocked = false; cloudConfirmed = false; candidate = "Unknown"
@@ -58,12 +60,12 @@ struct RecognitionHistory {
         guard !isLocked else { return candidate }
         let current = Self.displayName(value) ?? "Unknown"
         labels.append(current)
-        labels = Array(labels.suffix(10))
+        labels = Array(labels.suffix(Self.lockWindow))
         let counts = Dictionary(grouping: labels.filter { $0 != "Unknown" }, by: { $0 }).mapValues(\.count)
         let best = counts.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }.first
         candidate = best?.key ?? "Unknown"
-        confidence = Double(best?.value ?? 0) / 10
-        isLocked = labels.count == 10 && confidence >= 0.9 && current == candidate && candidate != "Unknown"
+        confidence = Double(best?.value ?? 0) / Double(Self.lockWindow)
+        isLocked = labels.count == Self.lockWindow && confidence >= 1 && current == candidate && candidate != "Unknown"
         return candidate
     }
 }
