@@ -40,6 +40,19 @@ def test_selection_sends_stages_candidates_and_nonstored_request(monkeypatch):
     assert "image_url" not in str(captured)
 
 
+def test_empty_model_selection_is_visible_in_logs(monkeypatch, caplog):
+    monkeypatch.setattr(analysis, "OpenAI", lambda **_kwargs: SimpleNamespace(
+        responses=SimpleNamespace(create=lambda **_params: SimpleNamespace(
+            id="resp_test", status="completed", output_text='{"cue_ids":[]}'))))
+    request, candidates = sample()
+    with caplog.at_level("INFO", logger="uvicorn.error"):
+        assert analysis.choose_cues(request, candidates, "secret-key", "model") == []
+    assert "response_id=resp_test" in caplog.text
+    assert 'output_text=\'{"cue_ids":[]}\'' in caplog.text
+    assert "cue_ids=[]" in caplog.text
+    assert "secret-key" not in caplog.text
+
+
 @pytest.mark.parametrize("status,output", [
     ("incomplete", '{"cue_ids":[]}'),
     ("completed", ""),

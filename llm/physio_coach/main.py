@@ -15,7 +15,7 @@ from .speech import SpeechError, synthesize_speech
 
 
 app = FastAPI(title="Physio measurement feedback")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 class FeedbackResponse(BaseModel):
@@ -52,6 +52,8 @@ async def feedback(request: FeedbackRequest) -> FeedbackResponse:
                 )
             except AnalysisError as exc:
                 raise HTTPException(502, str(exc)) from exc
+        else:
+            logger.info("No eligible correction cues from peak measurements: exercise=%s", request.exercise)
         result = approved_feedback(Feedback(
             status="assessable",
             observations=[candidates[item].observation for item in selected] or [evaluation.reason],
