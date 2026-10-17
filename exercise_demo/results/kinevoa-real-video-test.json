@@ -1,0 +1,1508 @@
+{
+  "clips" : [
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Squat",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 169.9819564819336,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 28.663039207458496,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 24.19900894165039,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.98095417022705,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.545005798339844,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.611001014709473,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.000027656555176,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.86396312713623,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.162965774536133,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.98293399810791,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.112991333007812,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.877076148986816,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.36595344543457,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.96798610687256,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.52803134918213,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.163012504577637,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.18208599090576,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.862055778503418,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.31905746459961,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.994999885559082,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "squat",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/squat\/1e2c254b-0d5a-4fd6-a6d4-2681333d927b.mp4",
+      "subject" : "1e2c254b-0d5a-4fd6-a6d4-2681333d927b",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Squat",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.885016441345215,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.754959106445312,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.733071327209473,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.352985382080078,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.01090145111084,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.436955451965332,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.284963607788086,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.721938133239746,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.60201358795166,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.796086311340332,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.504977226257324,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.761038780212402,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.386006355285645,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.56000518798828,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.733978271484375,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.32704448699951,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.755078315734863,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.97497272491455,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.518064498901367,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.741965293884277,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "squat",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/squat\/2a516b63-bccf-490e-807a-e6102303381f.mp4",
+      "subject" : "2a516b63-bccf-490e-807a-e6102303381f",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Squat",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.024895668029785,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.145965576171875,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.509077072143555,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.757939338684082,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.60201358795166,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.58398723602295,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.81694793701172,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.31793785095215,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.790053367614746,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.986940383911133,
+          "frame" : 9,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "squat",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/squat\/385c01f2-e604-46d4-a84b-949b733395dd.mp4",
+      "subject" : "385c01f2-e604-46d4-a84b-949b733395dd",
+      "totalFrames" : 10,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 0,
+      "expected" : "Push-up",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.954992294311523,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.610000610351562,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.10190486907959,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.28300952911377,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.93992519378662,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.019007682800293,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.887042999267578,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.42200756072998,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.731998443603516,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.322991371154785,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.105030059814453,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.203020095825195,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.217967987060547,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.647955894470215,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.133925437927246,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.330978393554688,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.141005516052246,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.46699619293213,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.274996757507324,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.853068351745605,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "push-up",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/push-up\/01b09356-3985-474f-827f-20c79cfcda78.mp4",
+      "subject" : "01b09356-3985-474f-827f-20c79cfcda78",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 0,
+      "correctRaw" : 4,
+      "expected" : "Push-up",
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.326997756958008,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.867897033691406,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.21689510345459,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.9660062789917,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.94700527191162,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.55599880218506,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.379019737243652,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.21601390838623,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.81198787689209,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.650936126708984,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.873976707458496,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.980979919433594,
+          "frame" : 11,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.371939659118652,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.715070724487305,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.635988235473633,
+          "frame" : 14,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.964980125427246,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.789052963256836,
+          "frame" : 16,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.46501636505127,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.49906349182129,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.509077072143555,
+          "frame" : 19,
+          "raw" : "pushup"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "push-up",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/push-up\/02dd7b9d-c7fe-41b8-993a-e250b07a5ceb.mp4",
+      "subject" : "02dd7b9d-c7fe-41b8-993a-e250b07a5ceb",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 9,
+      "correctRaw" : 13,
+      "expected" : "Push-up",
+      "firstCorrectSeconds" : 1.5,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.44899559020996,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.99199390411377,
+          "frame" : 1,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.960999488830566,
+          "frame" : 2,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 20.38705348968506,
+          "frame" : 3,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 18.780946731567383,
+          "frame" : 4,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 21.2709903717041,
+          "frame" : 5,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 19.80006694793701,
+          "frame" : 6,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 20.798921585083008,
+          "frame" : 7,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 19.562959671020508,
+          "frame" : 8,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 19.42300796508789,
+          "frame" : 9,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 19.04296875,
+          "frame" : 10,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.81198787689209,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.69499683380127,
+          "frame" : 12,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.103050231933594,
+          "frame" : 13,
+          "raw" : "pushup"
+        },
+        {
+          "display" : "Push-up",
+          "elapsedMS" : 22.004008293151855,
+          "frame" : 14,
+          "raw" : "pushup"
+        }
+      ],
+      "majorityDisplay" : "Push-up",
+      "name" : "push-up",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/push-up\/0b78db8e-3c32-4248-bbff-b483f9d910d3.mp4",
+      "subject" : "0b78db8e-3c32-4248-bbff-b483f9d910d3",
+      "totalFrames" : 15,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 18,
+      "correctRaw" : 18,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.011974334716797,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.500017166137695,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 24.464011192321777,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.60799503326416,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.584919929504395,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.42898941040039,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.19600772857666,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.392086029052734,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 24.21104907989502,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.00303363800049,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.15399932861328,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.117998123168945,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.766952514648438,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 23.012995719909668,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 25.519967079162598,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.22905445098877,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.259976387023926,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 25.89404582977295,
+          "frame" : 17,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "shoulder press",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/shoulder press\/17496a37-c1f7-4105-9c07-e7cfbca06106.mp4",
+      "subject" : "17496a37-c1f7-4105-9c07-e7cfbca06106",
+      "totalFrames" : 18,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 20,
+      "correctRaw" : 20,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.161986351013184,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.88597011566162,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 26.39007568359375,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.55990695953369,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.135926246643066,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 23.853063583374023,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 23.853063583374023,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 31.19194507598877,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 40.50600528717041,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 42.752981185913086,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 35.423994064331055,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 25.17092227935791,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.288918495178223,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 21.89803123474121,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.276997566223145,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.26100254058838,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.70596408843994,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.50705051422119,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.42090892791748,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.695043563842773,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "shoulder press",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/shoulder press\/237de26b-2b1e-4f62-9844-b30fc9860c72.mp4",
+      "subject" : "237de26b-2b1e-4f62-9844-b30fc9860c72",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 19,
+      "correctRaw" : 19,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.10698413848877,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.400954246520996,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.15299892425537,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.828081130981445,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.56009864807129,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.710970878601074,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.35899257659912,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.466042518615723,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.37203311920166,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.64502239227295,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.575953483581543,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.809914588928223,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.150065422058105,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.360946655273438,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.751978874206543,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.3789005279541,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.796013832092285,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.430041313171387,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.085930824279785,
+          "frame" : 18,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "shoulder press",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/shoulder press\/30fe126e-0985-48af-813f-65c30d49913d.mp4",
+      "subject" : "30fe126e-0985-48af-813f-65c30d49913d",
+      "totalFrames" : 19,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 21,
+      "correctRaw" : 21,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 27.591943740844727,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 30.706048011779785,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 35.185933113098145,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 26.045918464660645,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 22.236943244934082,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 23.15700054168701,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.638108253479004,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.132018089294434,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.111918449401855,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.18892765045166,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.371986389160156,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.260930061340332,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.661903381347656,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.588947296142578,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.0889835357666,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.844962120056152,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.66702938079834,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.20902729034424,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.661975860595703,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.67000961303711,
+          "frame" : 19,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.707918167114258,
+          "frame" : 20,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "barbell biceps curl",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/barbell biceps curl\/0d402adf-578c-4c26-ba50-3b28a6f0e648.mp4",
+      "subject" : "0d402adf-578c-4c26-ba50-3b28a6f0e648",
+      "totalFrames" : 21,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 20,
+      "correctRaw" : 20,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.682003021240234,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.736958503723145,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.792033195495605,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.1261043548584,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.0579891204834,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.46389675140381,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.99297332763672,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.239974975585938,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.463062286376953,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.86296272277832,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.21701431274414,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.567012786865234,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.803954124450684,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.209980964660645,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.691990852355957,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.307971000671387,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.164085388183594,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.307971000671387,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.42896842956543,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.620060920715332,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "barbell biceps curl",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/barbell biceps curl\/1a3e6f0d-fb99-4e4d-b80f-831c7f38aca9.mp4",
+      "subject" : "1a3e6f0d-fb99-4e4d-b80f-831c7f38aca9",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    },
+    {
+      "correctDisplay" : 20,
+      "correctRaw" : 20,
+      "expected" : "Unknown",
+      "firstCorrectSeconds" : 0,
+      "frames" : [
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.769906997680664,
+          "frame" : 0,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.997907638549805,
+          "frame" : 1,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.24996280670166,
+          "frame" : 2,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.63694190979004,
+          "frame" : 3,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.10190486907959,
+          "frame" : 4,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.728971481323242,
+          "frame" : 5,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.92697811126709,
+          "frame" : 6,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.63894271850586,
+          "frame" : 7,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.662976264953613,
+          "frame" : 8,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.57392692565918,
+          "frame" : 9,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.004987716674805,
+          "frame" : 10,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.426941871643066,
+          "frame" : 11,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.18208599090576,
+          "frame" : 12,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 18.841981887817383,
+          "frame" : 13,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.498991012573242,
+          "frame" : 14,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.245028495788574,
+          "frame" : 15,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 20.460009574890137,
+          "frame" : 16,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 17.39501953125,
+          "frame" : 17,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.505977630615234,
+          "frame" : 18,
+          "raw" : "unknown"
+        },
+        {
+          "display" : "Unknown",
+          "elapsedMS" : 19.384026527404785,
+          "frame" : 19,
+          "raw" : "unknown"
+        }
+      ],
+      "majorityDisplay" : "Unknown",
+      "name" : "barbell biceps curl",
+      "source" : "https:\/\/huggingface.co\/datasets\/RickyRiccio\/Real_Time_Exercise_Recognition_Dataset#similar_dataset\/barbell biceps curl\/27d82bac-ce83-4f91-a381-c11dd0bf6932.mp4",
+      "subject" : "27d82bac-ce83-4f91-a381-c11dd0bf6932",
+      "totalFrames" : 20,
+      "wrongDisplay" : 0
+    }
+  ],
+  "endpoint" : "https:\/\/172.20.10.3:8443\/predict",
+  "samplesPerSecond" : 2,
+  "transport" : "Native shared RecognitionRequest, PinnedTrust, RecognitionResponse, RecognitionHistory"
+}

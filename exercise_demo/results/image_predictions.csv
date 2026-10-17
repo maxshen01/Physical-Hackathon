@@ -1,0 +1,101 @@
+source,sample,truth,expected,exercise,raw_label,score,inference_ms
+workout_test,1170,squat,squat,squat,squat,0.9015142321586609,1503.6572499666363
+workout_test,1195,squat,squat,squat,squat,0.9423038959503174,66.32712506689131
+workout_test,1138,squat,squat,unknown,squat,0.18522857129573822,87.7125000115484
+workout_test,1191,squat,squat,squat,squat,0.8718794584274292,81.17020782083273
+workout_test,1188,squat,squat,squat,squat,0.9563175439834595,66.52999995276332
+workout_test,1194,squat,squat,squat,squat,0.9752147197723389,51.267625065520406
+workout_test,1135,squat,squat,squat,squat,0.7137393951416016,57.933625066652894
+workout_test,1130,squat,squat,squat,squat,0.9856019616127014,50.898666959255934
+workout_test,1163,squat,squat,squat,squat,0.9334765076637268,55.6855839677155
+workout_test,1162,squat,squat,squat,squat,0.9254156947135925,54.67937490902841
+workout_test,1185,squat,squat,squat,squat,0.9433357119560242,76.04854204691947
+workout_test,1131,squat,squat,squat,squat,0.9700739979743958,51.050208043307066
+workout_test,1159,squat,squat,squat,squat,0.9242526888847351,45.276999939233065
+workout_test,1178,squat,squat,squat,squat,0.8833791613578796,54.930999875068665
+workout_test,1132,squat,squat,squat,squat,0.9085497260093689,86.56304096803069
+workout_test,1176,squat,squat,squat,squat,0.8587787747383118,69.68550011515617
+workout_test,1181,squat,squat,squat,squat,0.9623490571975708,114.35270798392594
+workout_test,1151,squat,squat,squat,squat,0.9108937382698059,95.64212500117719
+workout_test,1169,squat,squat,squat,squat,0.8494394421577454,70.57412504218519
+workout_test,1160,squat,squat,squat,squat,0.9427443742752075,65.37237507291138
+workout_test,938,push up,pushup,pushup,push up,0.956559419631958,70.1929999049753
+workout_test,937,push up,pushup,pushup,push up,0.9407414793968201,77.3797919973731
+workout_test,907,push up,pushup,pushup,push up,0.9004544019699097,63.50733316503465
+workout_test,948,push up,pushup,pushup,push up,0.8294118642807007,56.95537501014769
+workout_test,959,push up,pushup,pushup,push up,0.9155759215354919,55.48970797099173
+workout_test,944,push up,pushup,pushup,push up,0.9405035376548767,52.403459092602134
+workout_test,935,push up,pushup,pushup,push up,0.9582039713859558,49.56920794211328
+workout_test,911,push up,pushup,pushup,push up,0.8743056058883667,49.564999993890524
+workout_test,925,push up,pushup,pushup,push up,0.8860321044921875,47.827000031247735
+workout_test,914,push up,pushup,pushup,push up,0.9117368459701538,50.01862486824393
+workout_test,930,push up,pushup,pushup,push up,0.9707890748977661,55.41425012052059
+workout_test,913,push up,pushup,pushup,push up,0.8234856724739075,52.31695808470249
+workout_test,956,push up,pushup,pushup,push up,0.9281516671180725,56.362542090937495
+workout_test,920,push up,pushup,pushup,push up,0.8251174092292786,58.076333021745086
+workout_test,906,push up,pushup,pushup,push up,0.8737356066703796,55.81658286973834
+workout_test,932,push up,pushup,pushup,push up,0.9048891067504883,56.78712506778538
+workout_test,950,push up,pushup,pushup,push up,0.8928917050361633,52.52862488850951
+workout_test,949,push up,pushup,pushup,push up,0.8789135217666626,54.49820798821747
+workout_test,936,push up,pushup,pushup,push up,0.9486914873123169,48.789708176627755
+workout_test,924,push up,pushup,pushup,push up,0.8861485123634338,54.62358286604285
+workout_test,552,lateral raises,lateral_raise,lateral_raise,lateral raises,0.8295780420303345,68.88083391822875
+workout_test,627,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9647387266159058,57.31541593559086
+workout_test,589,lateral raises,lateral_raise,unknown,lateral raises,0.5326471328735352,67.35212495550513
+workout_test,623,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9809421300888062,69.0537909977138
+workout_test,576,lateral raises,lateral_raise,lateral_raise,lateral raises,0.7533738017082214,93.63279212266207
+workout_test,618,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9293923377990723,48.77020884305239
+workout_test,604,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9675831198692322,63.543958123773336
+workout_test,565,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9738399982452393,99.35174998827279
+workout_test,590,lateral raises,lateral_raise,unknown,lateral raises,0.4740350544452667,128.7714170757681
+workout_test,556,lateral raises,lateral_raise,lateral_raise,lateral raises,0.8356167078018188,46.75574996508658
+workout_test,596,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9660025835037231,50.724165979772806
+workout_test,568,lateral raises,lateral_raise,lateral_raise,lateral raises,0.7403420209884644,52.86170798353851
+workout_test,603,lateral raises,lateral_raise,lateral_raise,lateral raises,0.953885018825531,50.10412493720651
+workout_test,609,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9179530143737793,55.38575001992285
+workout_test,582,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9900085926055908,54.73170895129442
+workout_test,629,lateral raises,lateral_raise,unknown,barbell biceps curl,0.289558082818985,48.45133307389915
+workout_test,575,lateral raises,lateral_raise,lateral_raise,lateral raises,0.747366726398468,48.906249925494194
+workout_test,612,lateral raises,lateral_raise,lateral_raise,lateral raises,0.8594059944152832,50.21620891056955
+workout_test,608,lateral raises,lateral_raise,lateral_raise,lateral raises,0.9562996625900269,57.20841605216265
+workout_test,578,lateral raises,lateral_raise,lateral_raise,lateral raises,0.8635499477386475,59.59354201331735
+workout_test,792,plank,unknown,unknown,plank,0.9752628207206726,46.335707884281874
+workout_test,749,plank,unknown,unknown,plank,0.9481693506240845,45.96129083074629
+workout_test,750,plank,unknown,unknown,plank,0.9411633610725403,46.600834000855684
+workout_test,772,plank,unknown,unknown,plank,0.9908393025398254,50.376125145703554
+workout_test,836,plank,unknown,unknown,plank,0.983497142791748,47.29370912536979
+workout_test,762,plank,unknown,unknown,plank,0.6963595151901245,47.89491603150964
+workout_test,795,plank,unknown,unknown,plank,0.9928930401802063,95.32004198990762
+workout_test,794,plank,unknown,unknown,plank,0.9935431480407715,55.71737512946129
+workout_test,819,plank,unknown,unknown,plank,0.9932491779327393,55.38174998946488
+workout_test,751,plank,unknown,unknown,plank,0.9039416909217834,53.273458033800125
+workout_test,802,plank,unknown,unknown,plank,0.9873871207237244,46.57320794649422
+workout_test,811,plank,unknown,unknown,plank,0.9533180594444275,48.0055408552289
+workout_test,801,plank,unknown,unknown,plank,0.9875416159629822,48.46112499944866
+workout_test,827,plank,unknown,unknown,plank,0.9877890944480896,47.96083294786513
+workout_test,798,plank,unknown,unknown,plank,0.9886055588722229,46.45329201593995
+workout_test,778,plank,unknown,unknown,plank,0.9895395636558533,46.59104091115296
+workout_test,796,plank,unknown,unknown,plank,0.9926912188529968,48.110416159033775
+workout_test,817,plank,unknown,unknown,plank,0.991477906703949,52.87479097023606
+workout_test,782,plank,unknown,unknown,plank,0.9928069114685059,47.24274994805455
+workout_test,753,plank,unknown,unknown,plank,0.9228335022926331,44.215874979272485
+workout_test,1078,shoulder press,unknown,unknown,shoulder press,0.9833971858024597,44.33574993163347
+workout_test,1081,shoulder press,unknown,unknown,shoulder press,0.821026086807251,45.824583154171705
+workout_test,1090,shoulder press,unknown,unknown,incline bench press,0.3819566071033478,45.238250168040395
+workout_test,1075,shoulder press,unknown,unknown,shoulder press,0.9746198654174805,44.19787507504225
+workout_test,1123,shoulder press,unknown,unknown,shoulder press,0.541096568107605,44.46154204197228
+workout_test,1087,shoulder press,unknown,unknown,shoulder press,0.9636368155479431,43.90599997714162
+workout_test,1098,shoulder press,unknown,unknown,shoulder press,0.9204620718955994,44.47741713374853
+workout_test,1118,shoulder press,unknown,unknown,shoulder press,0.8876549005508423,47.040542121976614
+workout_test,1109,shoulder press,unknown,unknown,shoulder press,0.9629288911819458,45.20404106006026
+workout_test,1092,shoulder press,unknown,unknown,shoulder press,0.7640464305877686,46.381541993469
+workout_test,1110,shoulder press,unknown,unknown,shoulder press,0.6514970660209656,44.92441611364484
+workout_test,1099,shoulder press,unknown,unknown,shoulder press,0.9426126480102539,46.78479116410017
+workout_test,1108,shoulder press,unknown,unknown,shoulder press,0.9713103175163269,47.387707978487015
+workout_test,1089,shoulder press,unknown,unknown,shoulder press,0.5009833574295044,246.49366596713662
+workout_test,1091,shoulder press,unknown,unknown,shoulder press,0.6997249126434326,64.53316705301404
+workout_test,1121,shoulder press,unknown,unknown,shoulder press,0.9519120454788208,87.8463750705123
+workout_test,1114,shoulder press,unknown,unknown,shoulder press,0.9120239019393921,69.72758308984339
+workout_test,1111,shoulder press,unknown,unknown,shoulder press,0.9153037667274475,53.79258398897946
+workout_test,1102,shoulder press,unknown,unknown,shoulder press,0.8959912657737732,50.415667006745934
+workout_test,1120,shoulder press,unknown,unknown,incline bench press,0.5008938908576965,65.4048330616206

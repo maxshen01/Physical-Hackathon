@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+.cache/
+exercise_demo/data/
+*.pem
+
+.env
+.env.*
+!.env.example
+
+# Local build products, machine state and runtime diagnostics
+node_modules/
+**/xcuserdata/
+*.xcuserstate
+*.log
+.srl
+demo_materials/.build/
+exercise_demo/results/movement_live*.json
+exercise_demo/results/phone-setup-qr.png
+exercise_demo/results/*inputs.jpg
+exercise_demo/results/examples.jpg

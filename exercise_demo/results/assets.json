@@ -1,0 +1,18 @@
+{
+  ".cache/model/model.safetensors": {
+    "sha256": "538620df8e10e95a5ab7becd62c814c2855397f4e2447f69b82c0943ae61e836",
+    "bytes": 371629520
+  },
+  ".cache/model/config.json": {
+    "sha256": "fb1cca34c96efb9b8709bee2b8f78590075615e8c4e2401e71bdf10639299127",
+    "bytes": 1629
+  },
+  "exercise_demo/data/workout-test.parquet": {
+    "sha256": "10fbe23749758c4cddc4ec1f1f3cbae842120b16ff5ef11566ec035cd6980191",
+    "bytes": 87568310
+  },
+  "exercise_demo/data/ucf101_subset.tar.gz": {
+    "sha256": "01ddf10937b3df7344432cd659a03f472e8ae5a9a77816a588292d098bd00598",
+    "bytes": 178491071
+  }
+}

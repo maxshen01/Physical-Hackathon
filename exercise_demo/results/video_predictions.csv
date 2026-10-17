@@ -1,0 +1,11 @@
+clip,expected,prediction,frames,frame_labels
+v_PushUps_g01_c04.avi,pushup,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_PushUps_g07_c02.avi,pushup,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_PushUps_g08_c04.avi,pushup,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_PushUps_g09_c04.avi,pushup,unknown,8,"['unknown', 'pushup', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_PushUps_g12_c02.avi,pushup,unknown,8,"['pushup', 'unknown', 'unknown', 'unknown', 'pushup', 'unknown', 'pushup', 'unknown']"
+v_JumpingJack_g04_c03.avi,unknown,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_JumpingJack_g05_c03.avi,unknown,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_JumpingJack_g06_c03.avi,unknown,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_JumpingJack_g06_c05.avi,unknown,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
+v_JumpingJack_g12_c02.avi,unknown,unknown,8,"['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown']"
