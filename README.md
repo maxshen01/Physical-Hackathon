@@ -1,45 +1,37 @@
-# Kinevoa — Physical AI Hackathon
+# Kinevoa
 
-Exercise-recognition prototype with a native iPhone camera app and a Python backend.
+Live exercise recognition for **Squat, Push-up, Lateral raise, or Unknown**.
 
-- Image classification across 22 workout classes, with Squat, Push-up and Lateral raise accepted by the local app.
-- Pose-based movement recognition and a person-crop retry for uncertain images.
-- Live leading-label/model-confidence display, with a separate session-agreement lock.
-- Optional GPT-5.4 nano vision fallback after 20 unresolved seconds; two fresh-sequence checks must agree before locking one of the three supported exercises. All other exercises return Unknown.
-- Re-classify starts a fresh session. Camera frames are not saved; the optional cloud fallback sends selected in-memory frames to OpenAI.
+## Components
 
-## Start here
+| Folder | Responsibility |
+| --- | --- |
+| [classifier/](classifier/) | Installable Python inference package, HTTP server, browser client, tests and evaluation tools |
+| [ios/](ios/) | Standalone iPhone camera app and native session-lock tests |
+| [contracts/](contracts/) | Shared HTTP interface and generated OpenAPI schema |
 
-- [Backend setup, datasets and evaluation](exercise_demo/README.md)
-- [Native iOS app](exercise_demo/ios/README.md)
-- [OpenAI fallback and environment setup](exercise_demo/OPENAI_FALLBACK.md)
-- [Phone HTTPS setup](exercise_demo/PHONE_SETUP.md)
-- [Classifier results and limitations](exercise_demo/results/MOVEMENT_REPORT.md)
-- [Brand assets](branding/BRAND_GUIDE.md)
-- [Demo guide](demo_materials/output/kinevoa-demo-guide.md)
+The iPhone app depends only on the HTTP contract. It has no Python, model-weight or provider-key dependency. Additional clients can use that contract; additional inference providers belong behind the classifier API. Branding kits and presentation materials are excluded.
 
-## Local setup
+## Run the classifier
 
-Use Python 3.11. From the repository root:
+From the repository root, using Python 3.11:
 
 ```sh
 python3.11 -m venv .venv
-.venv/bin/pip install -r exercise_demo/requirements.txt
-.venv/bin/python exercise_demo/download_data.py
-mkdir -p .cache/pose
-curl -fL https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task -o .cache/pose/pose_landmarker_full.task
-cp .env.example .env.local
-.venv/bin/python -m uvicorn server:app --app-dir exercise_demo --host 127.0.0.1 --port 8000
+.venv/bin/pip install -e './classifier[evaluation,test]'
+.venv/bin/python classifier/tools/download_data.py
+.venv/bin/python -m kinevoa_classifier --host 127.0.0.1 --port 8000
 ```
 
-Add your key to `.env.local` to enable the optional OpenAI fallback. The local classifiers run without it. Model weights, datasets, credentials and machine-specific build products are excluded from git. The supplied iOS demo CA certificate is public; private certificate keys are excluded. Configure signing and HTTPS for your own device using the linked guides.
+Open http://localhost:8000 for the browser client. For iPhone HTTPS setup, see [phone setup](classifier/docs/PHONE_SETUP.md) and [iOS setup](ios/README.md). Optional server-side provider settings are documented in [.env.example](.env.example) and [fallback setup](classifier/docs/OPENAI_FALLBACK.md). Never put keys in the iOS app.
 
-## Checks
+## Verify
 
 ```sh
-.venv/bin/python -m unittest discover -s exercise_demo -p 'test_*.py'
-xcrun swiftc -parse-as-library -module-cache-path .cache/swift-module-cache exercise_demo/ios/MoveCamera/RecognitionProtocol.swift exercise_demo/ios/SessionLockTests.swift -o .cache/session-lock-tests
+.venv/bin/python -m unittest discover -s classifier/tests -p 'test_*.py'
+mkdir -p .cache/swift-module-cache
+xcrun swiftc -parse-as-library -module-cache-path .cache/swift-module-cache ios/MoveCamera/RecognitionProtocol.swift ios/Tests/SessionLockTests.swift -o .cache/session-lock-tests
 .cache/session-lock-tests
 ```
 
-Model confidence is not measured accuracy. The saved results document convenience-sample tests and remaining misses; this prototype does not provide validated clinical assessment or live form coaching.
+See [classifier evaluation](classifier/results/MOVEMENT_REPORT.md) for recorded experiments and limitations. Live scores and session agreement are not measured accuracy. This is an experimental classifier, not clinically validated guidance.
