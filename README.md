@@ -3,7 +3,7 @@
 An iPhone demo with one guided flow:
 
 1. Tap **Start recording** and perform a squat, push-up or lateral raise. Recognition locks after sufficient agreement; frame uploads then pause.
-2. The phone estimates the facing direction and recommends one of eight camera marks and a lens height. Tap **Use this position**, then move the phone there.
+2. The phone estimates the facing direction and recommends one of eight camera marks and a lens height. If automatic detection is stuck, tap **Choose facing direction** and select the mark the person is looking towards. Tap **Continue · camera mark N**, then move the phone there.
 3. Tap **Capture image**. The server extracts image-plane pose features from that one image.
 4. Validated features go to the LLM service, followed by ElevenLabs. **Voice feedback plays automatically**; replay and stop controls are available. A transcript remains available if speech fails.
 
@@ -35,9 +35,13 @@ cp .cache/tls/move-demo-ca.cer ios/MoveCamera/move-demo-ca.cer
 open ios/MoveCamera.xcodeproj
 ```
 
-Build/run scheme **MoveCamera** on a physical iPhone. In the app's gear menu, enter `https://192.168.1.42:8443` (replace the IP). Keep both devices on the same Wi-Fi. Leave the separate feedback address blank. The app validates the exact hostname against its bundled demo CA; redirects are rejected. A separately hosted feedback service can use a publicly trusted HTTPS URL in the optional setting.
+Set `address` in `ios/MoveCamera/ContentView.swift` to `https://192.168.1.42:8443`
+(replace the IP), then build/run scheme **MoveCamera** on a physical iPhone.
+The current demo uses this fixed address rather than a settings page. Keep both
+devices on the same Wi-Fi. The app validates the exact hostname against its
+bundled demo CA; redirects are rejected.
 
-Under **Placement options**, set the person's height and starting floor mark (default: mark 5). Correct **Person faces** if the inferred facing is wrong. The phone does not verify that you moved to the suggested mark, so keep the subject's direction unchanged and place the phone as instructed. The shown camera angle is an estimate based on that position.
+Under **Position setup**, set the person's height and starting floor mark (default: mark 5). Choose the person's facing direction if the estimate is wrong, using the labelled control or the tappable diagram. The phone does not verify that you moved to the suggested mark, so keep the subject's direction unchanged and place the phone as instructed. The shown camera angle is an estimate based on that position.
 
 ## Components and API
 

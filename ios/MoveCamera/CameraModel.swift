@@ -70,7 +70,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             self.queue.async {
                 guard self.wantsStart, !self.active else { return }
                 guard (80...250).contains(self.heightCM) else {
-                    self.publish { self.message = "Enter a person’s height between 80 and 250 cm in Placement options." }
+                    self.publish { self.message = "Enter a person’s height between 80 and 250 cm in Position setup." }
                     return
                 }
                 do {
@@ -295,10 +295,16 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
             self.headings.reset()
             self.placementResult = nil
             self.placementLocked = false
+            let positioning = self.history.isLocked && self.placementExercise != nil
             self.publish {
                 self.recommendation = nil
                 self.orientationSource = ""
-                if self.labelLocked { self.step = .position }
+                if positioning {
+                    self.step = .position
+                    self.message = (80...250).contains(heightCM)
+                        ? "Choose the floor mark the person is facing, or hold still for Automatic."
+                        : "Enter a person’s height between 80 and 250 cm."
+                }
             }
             self.applyFacingOverride()
         }
@@ -306,10 +312,43 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
 
     func lockPlacement() {
         queue.async {
-            guard self.active, self.placementResult != nil,
-                  self.facingOverride != nil || self.headings.current(at: ProcessInfo.processInfo.systemUptime) != nil else { return }
+            guard self.active, !self.photoPending else { return }
+            guard (80...250).contains(self.heightCM) else {
+                self.publish { self.message = "Enter a person’s height between 80 and 250 cm before continuing." }
+                return
+            }
+            guard self.placementResult != nil,
+                  self.facingOverride != nil || self.headings.current(at: ProcessInfo.processInfo.systemUptime) != nil else {
+                self.placementResult = nil
+                self.publish {
+                    self.recommendation = nil
+                    self.orientationSource = ""
+                    self.step = .position
+                    self.message = "The facing estimate expired. Choose the person’s facing direction to continue, or hold still and try Automatic again."
+                }
+                return
+            }
             self.placementLocked = true
             self.publish { self.step = .capture; self.message = "Move to the highlighted mark. Keep the whole body in view, then capture an image." }
+        }
+    }
+
+    func revisePlacement() {
+        queue.async {
+            guard self.active, self.placementExercise != nil, !self.photoPending else { return }
+            self.placementLocked = false
+            self.placementResult = nil
+            self.headings.reset()
+            self.lastHeadingTime = .distantPast
+            self.publish {
+                self.clearCapture()
+                self.reviewInput = nil
+                self.recommendation = nil
+                self.orientationSource = ""
+                self.step = .position
+                self.message = "Return the phone to its starting mark before checking the position again."
+            }
+            self.applyFacingOverride()
         }
     }
 
@@ -348,7 +387,7 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
               let result = PlacementEngine.recommend(exercise: exercise, subjectHeightCM: heightCM,
                 headingDegrees: stable, setupMarker: setupMarker) else {
             placementResult = nil
-            publish { self.recommendation = nil; self.orientationSource = ""; self.message = "Facing is not stable. Hold still with your full body visible, or correct Person faces in Placement options." }
+            publish { self.recommendation = nil; self.orientationSource = ""; self.message = "Facing is not stable. Hold still with your full body visible, or tap Choose facing direction." }
             return
         }
         placementResult = result
@@ -403,4 +442,29 @@ final class CameraModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSam
     }
 
     private func publish(_ action: @escaping @Sendable () -> Void) { DispatchQueue.main.async(execute: action) }
+
+    #if PLACEMENT_FLOW_TESTS
+    /// Exercise the real post-recognition transitions without opening a camera
+    /// or contacting a server. Not compiled into the application target.
+    static func placementTestModel(expiredAutomatic: Bool = false) -> CameraModel {
+        let model = CameraModel()
+        model.active = true
+        for _ in 0..<RecognitionHistory.lockWindow { _ = model.history.update("squat") }
+        model.placementExercise = .squat
+        model.exercise = "Squat"
+        model.labelLocked = true
+        model.running = true
+        model.step = .position
+        if expiredAutomatic {
+            let time = ProcessInfo.processInfo.systemUptime
+            _ = model.headings.add(180, at: time - 5)
+            _ = model.headings.add(180, at: time - 4.5)
+            _ = model.headings.add(180, at: time - 4)
+            model.placementResult = PlacementEngine.recommend(exercise: .squat, subjectHeightCM: 170,
+                                                               headingDegrees: 180, setupMarker: .bottom)
+            model.recommendation = model.placementResult
+        }
+        return model
+    }
+    #endif
 }

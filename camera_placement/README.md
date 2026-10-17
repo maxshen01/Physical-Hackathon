@@ -23,12 +23,14 @@ Start with the phone at mark **5** (the sketch's CAMERA mark), or choose the
 actual setup mark in the app. Aim the rear camera at one fully visible person,
 holding it upright in portrait. The setup mark matters because body direction
 from an image is relative to the camera. Keep the phone there until a stable
-recommendation appears, then tap **Use this position** before moving it. Put the
+recommendation appears, then tap **Continue · camera mark N** before moving it. Put the
 phone at the highlighted mark, set its **lens** to the shown height above the
 floor, and tap **Capture image**. The app stores no photo history.
 
 The recommendation shows the direction inferred from the setup image. If that
-direction is wrong, choose the correct floor mark in **Person faces** under **Placement options**. The recommendation is recalculated on the phone using
+direction is wrong, choose the correct floor mark in **Which way is the person facing?** under **Position setup**, or tap a mark on the diagram. When no
+recommendation is available, the bottom **Choose facing direction** button opens
+the same choice. The recommendation is recalculated on the phone using
 the same fixed preset. Select **Automatic** to try live detection again.
 
 ## Orientation models and evidence

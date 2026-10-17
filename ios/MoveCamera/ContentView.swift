@@ -10,9 +10,20 @@ struct ContentView: View {
     @State private var heightText = "170"
     @State private var setupMarker: FloorMarker = .bottom
     @State private var facingOverride: FloorMarker?
+    @State private var choosingFacing = false
+    @FocusState private var heightFocused: Bool
     @Environment(\.scenePhase) private var scenePhase
 
     private var heightCM: Double { Double(heightText) ?? 0 }
+    private var validHeight: Bool { (80...250).contains(heightCM) }
+    private var canContinue: Bool {
+        switch camera.step {
+        case .recognise: !camera.running && validHeight
+        case .position: validHeight
+        case .capture, .review: true
+        case .processing: false
+        }
+    }
     private var title: String {
         switch camera.step {
         case .recognise: camera.running ? "Let’s recognise your exercise" : "Ready when you are"
@@ -48,7 +59,7 @@ struct ContentView: View {
                 }.accessibilityLabel("Step \(stepNumber) of 4")
                 Text(title).font(.title2.bold())
                 CameraPreview(session: camera.session)
-                    .frame(height: 280)
+                    .frame(height: camera.step == .position ? 180 : 280)
                     .overlay {
                         if !camera.running {
                             VStack(spacing: 10) {
@@ -93,53 +104,41 @@ struct ContentView: View {
                             Text("Approx. camera angle: \(result.approximateCameraAngleDegrees)° clockwise from facing")
                                 .font(.footnote).foregroundStyle(.secondary)
                             Text(camera.orientationSource).font(.caption).foregroundStyle(.secondary)
-                            FloorMap(selected: result.marker, setup: setupMarker).frame(height: 160)
                         }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
                     } else {
-                        Text("Hold steady at your setup mark. Keep the whole body visible while we estimate the facing direction.")
+                        Text("Keep the phone at its starting mark. Hold the whole person in view, or choose their facing direction below.")
                             .foregroundStyle(.secondary)
                     }
                 }
                 if camera.step == .recognise || camera.step == .position {
-                    DisclosureGroup("Placement options") {
-                        VStack(spacing: 12) {
-                            HStack {
-                                Text("Person’s height")
-                                Spacer()
-                                TextField("170", text: $heightText).keyboardType(.decimalPad)
-                                    .multilineTextAlignment(.trailing).frame(width: 70).textFieldStyle(.roundedBorder)
-                                    .accessibilityLabel("Height in centimetres")
-                                Text("cm")
-                            }
-                            Picker("Setup camera mark", selection: $setupMarker) {
-                                ForEach(FloorMarker.allCases) { mark in Text("\(mark.number) · \(mark.title)").tag(mark) }
-                            }
-                            Picker("Person faces", selection: $facingOverride) {
-                                Text("Automatic").tag(nil as FloorMarker?)
-                                ForEach(FloorMarker.allCases) { mark in Text("\(mark.number) · \(mark.title)").tag(Optional(mark)) }
-                            }
-                            Text("Start at the selected floor mark. Correct the facing direction if the estimate is wrong.")
+                    placementControls
+                }
+                if camera.labelLocked {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(camera.step == .position ? "Which way is the person facing?" : "Your camera position")
+                            .font(.headline)
+                        if camera.step == .position {
+                            Text("Tap the numbered mark the person is looking towards. This sets their direction; Orbit chooses the camera mark.")
                                 .font(.footnote).foregroundStyle(.secondary)
-                        }.padding(.top, 10)
+                        }
+                        FloorMap(selected: camera.recommendation?.marker, setup: setupMarker,
+                                 facing: displayedFacing,
+                                 onSelect: camera.step == .position ? { mark in heightFocused = false; facingOverride = mark } : nil)
+                            .frame(height: 210)
+                        HStack(spacing: 14) {
+                            Label("Camera target", systemImage: "circle.fill").foregroundStyle(signal)
+                            Label("Person faces", systemImage: "arrow.up").foregroundStyle(.cyan)
+                        }.font(.caption)
+                        Text("Outlined circle = phone’s starting mark. Numbers stay fixed on the floor.")
+                            .font(.caption).foregroundStyle(.secondary)
                     }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
                 }
-                if camera.step == .processing {
-                    HStack { ProgressView().tint(signal); Text(camera.message) }.padding(.vertical)
-                        .accessibilityAddTraits(.updatesFrequently)
-                } else {
-                    Button(action: primaryAction) {
-                        Text(primaryLabel).fontWeight(.semibold).frame(maxWidth: .infinity).padding(.vertical, 10)
-                    }
-                    .buttonStyle(.borderedProminent).tint(signal).foregroundStyle(.black)
-                    .disabled((camera.step == .position && camera.recommendation == nil) || (camera.step == .recognise && camera.running))
-                    if camera.step != .recognise || !camera.running {
-                        Text(camera.message).font(.footnote).foregroundStyle(.secondary)
-                            .accessibilityAddTraits(.updatesFrequently)
-                    } else {
-                        Text(camera.message).font(.footnote).foregroundStyle(.secondary)
-                    }
-                }
+                Text(camera.message).font(.footnote).foregroundStyle(.secondary)
+                    .accessibilityAddTraits(.updatesFrequently)
                 if camera.running {
+                    if camera.step == .capture || camera.step == .review {
+                        Button("Change camera position") { camera.revisePlacement() }
+                    }
                     HStack {
                         Button("Start over") { facingOverride = nil; camera.reclassify() }
                         Spacer()
@@ -152,10 +151,49 @@ struct ContentView: View {
         }
         .background(Color(red: 0.07, green: 0.08, blue: 0.10))
         .preferredColorScheme(.dark).tint(signal)
+        .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom) { actionBar }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") { heightFocused = false }
+            }
+        }
         .onChange(of: heightText) { _, _ in updatePlacement() }
         .onChange(of: setupMarker) { _, _ in updatePlacement() }
         .onChange(of: facingOverride) { _, _ in updatePlacement() }
-        .onChange(of: scenePhase) { _, phase in if phase != .active { camera.stop() } }
+        .onChange(of: scenePhase) { _, phase in if phase == .background { camera.stop() } }
+        .sheet(isPresented: $choosingFacing) {
+            NavigationStack {
+                List {
+                    Section {
+                        Text("Choose the numbered floor mark the person is looking towards. Orbit will use it to choose the camera position.")
+                            .font(.subheadline)
+                    }
+                    Section("Person’s facing direction") {
+                        Button("Automatic · use camera detection") { facingOverride = nil; choosingFacing = false }
+                        ForEach(FloorMarker.allCases) { mark in
+                            Button {
+                                facingOverride = mark
+                                choosingFacing = false
+                            } label: {
+                                HStack {
+                                    Text("Facing mark \(mark.number) · \(mark.title)")
+                                    Spacer()
+                                    if facingOverride == mark { Image(systemName: "checkmark") }
+                                }.padding(.vertical, 6)
+                            }
+                            .accessibilityIdentifier("placement.facing.choice.\(mark.number)")
+                        }
+                    }
+                }
+                .navigationTitle("Person faces")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { choosingFacing = false }
+                } }
+            }.preferredColorScheme(.dark).tint(signal)
+        }
         .sheet(item: $camera.reviewInput, onDismiss: {
             camera.clearCapture()
         }) { input in
@@ -163,10 +201,94 @@ struct ContentView: View {
         }
     }
 
+    private var displayedFacing: FloorMarker? {
+        if let facingOverride { return facingOverride }
+        guard let degrees = camera.recommendation?.subjectHeadingDegrees else { return nil }
+        return FloorMarker(rawValue: Int((degrees / 45).rounded()) % 8)
+    }
+
+    private var placementControls: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text("Position setup").font(.headline)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Person’s height").font(.subheadline.bold())
+                HStack {
+                    TextField("Height", text: $heightText).keyboardType(.decimalPad)
+                        .focused($heightFocused).textFieldStyle(.roundedBorder)
+                        .accessibilityLabel("Person’s height in centimetres")
+                        .accessibilityIdentifier("placement.height")
+                    Text("cm")
+                }
+                Text(validHeight ? "Used to set the camera lens height." : "Enter a height from 80 to 250 cm.")
+                    .font(.caption).foregroundStyle(validHeight ? Color.secondary : .orange)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Where is the phone now?").font(.subheadline.bold())
+                Text("Choose its starting floor mark, before moving it.").font(.caption).foregroundStyle(.secondary)
+                Menu {
+                    ForEach(FloorMarker.allCases) { mark in
+                        Button("Mark \(mark.number) · \(mark.title)") { heightFocused = false; setupMarker = mark }
+                    }
+                } label: {
+                    selectionLabel("Mark \(setupMarker.number) · \(setupMarker.title)")
+                }
+                .accessibilityLabel("Phone’s starting floor mark")
+                .accessibilityValue("Mark \(setupMarker.number), \(setupMarker.title)")
+                .accessibilityIdentifier("placement.setup")
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Which way is the person facing?").font(.subheadline.bold())
+                Text("Choose the floor mark they are looking towards. Use this if Automatic is stuck or wrong.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Button { heightFocused = false; choosingFacing = true } label: {
+                    selectionLabel(facingOverride.map { "Facing mark \($0.number) · \($0.title)" } ?? "Automatic · camera detection")
+                }
+                .accessibilityLabel("Person’s facing direction")
+                .accessibilityValue(facingOverride.map { "Mark \($0.number), \($0.title)" } ?? "Automatic")
+                .accessibilityIdentifier("placement.facing")
+            }
+        }.padding(16).background(panel, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func selectionLabel(_ value: String) -> some View {
+        HStack {
+            Text(value).multilineTextAlignment(.leading)
+            Spacer(minLength: 8)
+            Image(systemName: "chevron.up.chevron.down")
+        }
+        .foregroundStyle(.white).padding(12).frame(maxWidth: .infinity, minHeight: 48)
+        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+        .contentShape(Rectangle())
+    }
+
+    private var actionBar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if !validHeight {
+                Text("Enter a height from 80 to 250 cm to continue.").font(.footnote).foregroundStyle(.orange)
+            } else if camera.step == .position && camera.recommendation == nil {
+                Text("Automatic is still checking. Tap Choose facing direction to select the mark the person is looking towards.")
+                    .font(.footnote).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("placement.waiting")
+            }
+            if camera.step == .processing {
+                HStack { ProgressView().tint(signal); Text(camera.message) }
+                    .accessibilityAddTraits(.updatesFrequently)
+            } else {
+                Button { heightFocused = false; primaryAction() } label: {
+                    Text(primaryLabel).fontWeight(.semibold).frame(maxWidth: .infinity).padding(.vertical, 10)
+                }
+                .buttonStyle(.borderedProminent).tint(signal).foregroundStyle(.black)
+                .disabled(!canContinue)
+                .accessibilityIdentifier("flow.continue")
+            }
+        }.padding(.horizontal, 20).padding(.vertical, 12)
+            .background(Color(red: 0.07, green: 0.08, blue: 0.10))
+    }
+
     private var primaryLabel: String {
         switch camera.step {
         case .recognise: camera.running ? "Recognising…" : "Start recording"
-        case .position: "Use this position"
+        case .position: camera.recommendation.map { "Continue · camera mark \($0.marker.number)" } ?? "Choose facing direction"
         case .capture: "Capture image"
         case .processing: "Processing…"
         case .review: "Capture another image"
@@ -177,7 +299,9 @@ struct ContentView: View {
         case .recognise:
             guard !camera.running else { return }
             updatePlacement(); camera.start(address: address)
-        case .position: camera.lockPlacement()
+        case .position:
+            if camera.recommendation == nil { choosingFacing = true }
+            else { camera.lockPlacement() }
         case .capture, .review: camera.captureImage()
         case .processing: break
         }
@@ -190,19 +314,33 @@ struct ContentView: View {
 private struct FloorMap: View {
     let selected: FloorMarker?
     let setup: FloorMarker
+    let facing: FloorMarker?
+    var onSelect: ((FloorMarker) -> Void)?
     var body: some View {
         GeometryReader { geometry in
             let centre = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
             let radius = min(geometry.size.width * 0.36, geometry.size.height * 0.39)
-            Text("YOU").font(.caption.bold()).position(centre)
+            VStack(spacing: 4) {
+                if let facing {
+                    Image(systemName: "arrow.up").font(.title2.bold()).foregroundStyle(.cyan)
+                        .rotationEffect(.degrees(facing.angleDegrees))
+                }
+                Text("PERSON").font(.caption.bold())
+            }.position(centre)
             ForEach(FloorMarker.allCases) { mark in
-                Text("\(mark.number)").font(.caption.bold())
-                    .foregroundStyle(selected == mark ? .black : .white)
-                    .frame(width: 30, height: 30)
-                    .background(selected == mark ? Color(red: 0.79, green: 0.98, blue: 0.10) : Color.gray.opacity(0.25), in: Circle())
-                    .overlay { if setup == mark { Circle().stroke(.secondary, lineWidth: 1) } }
-                    .position(x: centre.x + radius * mark.horizontal, y: centre.y + radius * mark.vertical)
-                    .accessibilityLabel("Mark \(mark.number), \(mark.title)\(selected == mark ? ", recommended" : "")\(setup == mark ? ", setup camera" : "")")
+                Button { onSelect?(mark) } label: {
+                    Text("\(mark.number)").font(.subheadline.bold())
+                        .foregroundStyle(selected == mark ? .black : .white)
+                        .frame(width: 44, height: 44)
+                        .background(selected == mark ? Color(red: 0.79, green: 0.98, blue: 0.10) : Color.gray.opacity(0.25), in: Circle())
+                        .overlay { if setup == mark { Circle().stroke(.white, lineWidth: 2) } }
+                        .overlay { if facing == mark { Circle().stroke(.cyan, lineWidth: 3).padding(-4) } }
+                }
+                .buttonStyle(.plain)
+                .allowsHitTesting(onSelect != nil)
+                .position(x: centre.x + radius * mark.horizontal, y: centre.y + radius * mark.vertical)
+                .accessibilityLabel("\(onSelect == nil ? "Mark" : "Face mark") \(mark.number), \(mark.title)\(selected == mark ? ", camera target" : "")\(setup == mark ? ", starting phone position" : "")")
+                .accessibilityIdentifier("placement.mark.\(mark.number)")
             }
         }.accessibilityElement(children: .contain)
     }
